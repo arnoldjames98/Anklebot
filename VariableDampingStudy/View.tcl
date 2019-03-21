@@ -2,7 +2,7 @@
 # Created by James Arnold
 
 package require Tk
-package provide snack 2.2
+#package provide snack 2.2 (doesn't work yet)
 source Controller.tcl
 
 # ---------------Study Specifications------------------
@@ -52,11 +52,11 @@ set insideTargetColor "#FFD45C"
 
 # -------------------Functions------------------------
 
-# Play a .wav audio file
-proc playwav myWavFile { 
-    snack::sound s -file $myWavFile
-    s play -block 1
-}
+# Play a .wav audio file (does't work yet)
+#proc playwav myWavFile { 
+#    snack::sound s -file $myWavFile
+#    s play -block 1
+#}
 
 # Draw a gradient (used for the background of the canvas)
 proc drawGradient {win axis col1Str col2Str} {
@@ -410,12 +410,9 @@ every 10 {
                     # Sends a signal to the controller that shows the distance of the target
                     sendTargetDistanceSignal $currentTarget
 
-                    #
-                    puts "BEEP"
+                    # Play an audio file at the start of each trial (doesn't work yet)
+                    #puts "BEEP"
                     #playwav /home/imt/imt/robot4/protocols/ankle/VariableDampingStudy/Supporting/go.wav
-                    set thefile "/home/imt/imt/robot4/protocols/ankle/VariableDampingStudy/Supporting/go.wav"
-                    #exec {*}[auto_execok start] "" [file nativename [file normalize $thefile]]
-                    eval exec [auto_execok start] [list "" [file nativename [file normalize $thefile]]]
 
                     # Show text that says "Go!" next to or above the target, depending on whether the trial is DP or IE
       				if {$studyType == "DP"} {
