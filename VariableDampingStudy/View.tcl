@@ -354,6 +354,12 @@ every 10 {
             puts "Error: studyType is $studyType but should be DP or IE"
         }
 
+        # Called at the start of every block, including block 1
+        # Prevents the problem of the first trial of each block starting in the neutral without any waiting
+        if {$i == 0 } {
+    		set requiredTimeInsideTarget 5000
+        }
+
         # What happens when the subject/cursor is inside of the target
         if {[ expr $currentTarget - $targetRadius ] <= $innerCursor && [ expr $currentTarget + $targetRadius ] >= $outerCursor} {
             # Visual feedback that user is inside of target
@@ -389,6 +395,7 @@ every 10 {
 
                     # Neutral target, random time range to be met (How long is needed to stay inside the target to meet the target)
                     set requiredTimeInsideTarget [randomInRange $neutralTimeRange]
+
                     # When i = 0, trial number is output twice: before and after the block
                     # Therefore, only dispaly when i > 0
                     if {$i > 0} {
@@ -404,6 +411,7 @@ every 10 {
                 } else {
                     # Targets at a distance, constant time range to be met
                     set requiredTimeInsideTarget $targetTime
+
                     # Where the trial number is being updated, but it is displayed in the if clause of this statement
                     set currentTrial [expr $currentTrial + 1]
                     
