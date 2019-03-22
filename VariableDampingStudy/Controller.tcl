@@ -12,9 +12,9 @@ bind . <Key-q> done
 set studyType "DP"
 
 # Damping environments and the number of blocks for each (place in order)
-set dampingEnvironments [list {zero 1} {tuning 2} {variable 1} {negative 1} {positive 1}]
+set dampingEnvironments [list {zero 1} {tuning 3} {variable 5} {negative 5} {positive 5}]
 # Number of trials in a block, should be even in order to ensure equal number of trials in both directions
-set trialsPerBlock 4
+set trialsPerBlock 10
 # Damping values
 set negativeDamping -1.0
 set positiveDamping 2.0

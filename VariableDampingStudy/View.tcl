@@ -8,7 +8,7 @@ source Controller.tcl
 # ---------------Study Specifications------------------
 
 # Degrees from the center for the target
-set targetDistance 10
+set targetDistance 15
 
 # Time required to meet targets, in ms
 set targetTime 2000
@@ -30,7 +30,7 @@ set canvasWidth 980
 set canvasHeight $canvasWidth
 
 # Number of degrees to show over the full width and height (ie. -20 to 20 is a degreeRange of 40)
-set degreeRange 30
+set degreeRange 40
 
 # Spacing in degrees of the background grid
 set gridSpacing 1
