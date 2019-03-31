@@ -1,0 +1,1 @@
+imt@imtrobot:~/SnackNEW/snack2.2.10/unix$ ./configure --with-tcl=/usr/lib/tcl8.6 --with-tk=/usr/lib/tk8.6

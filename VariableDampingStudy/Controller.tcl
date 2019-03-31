@@ -9,15 +9,15 @@ bind . <Key-q> done
 # ---------------Study Specifications------------------
 
 # Either DP or IE
-set studyType "DP"
+set studyType "IE"
 
 # Damping environments and the number of blocks for each (place in order)
 set dampingEnvironments [list {zero 1} {tuning 3} {variable 5} {negative 5} {positive 5}]
 # Number of trials in a block, should be even in order to ensure equal number of trials in both directions
 set trialsPerBlock 10
 # Damping values
-set negativeDamping -1.0
-set positiveDamping 2.0
+set negativeDamping -0.5
+set positiveDamping 1
 set variableDampingRange [list $negativeDamping $positiveDamping]
 
 # Initialized list of every damping enviorment in order
@@ -194,6 +194,7 @@ set Hz 1000
 wshm restart_Hz $Hz
 wshm Hz $Hz
 wshm restart_go 1
+wshm butcutoff 2
 
 puts "Please enter subject name"
 gets stdin subjectName

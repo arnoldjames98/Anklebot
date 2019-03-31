@@ -8,7 +8,7 @@ source Controller.tcl
 # ---------------Study Specifications------------------
 
 # Degrees from the center for the target
-set targetDistance 15
+set targetDistance 7.5
 
 # Time required to meet targets, in ms
 set targetTime 2000
@@ -16,7 +16,7 @@ set neutralTimeRange [list 1500 4000]
 
 # Radii of the cursor and target in degrees
 set cursorRadius 1
-set targetRadius 2
+set targetRadius 1.5
 
 # --------------Initialized Variables-----------------
 
@@ -30,7 +30,7 @@ set canvasWidth 980
 set canvasHeight $canvasWidth
 
 # Number of degrees to show over the full width and height (ie. -20 to 20 is a degreeRange of 40)
-set degreeRange 40
+set degreeRange 24
 
 # Spacing in degrees of the background grid
 set gridSpacing 1
@@ -418,9 +418,8 @@ every 10 {
                     # Sends a signal to the controller that shows the distance of the target
                     sendTargetDistanceSignal $currentTarget
 
-                    # Play an audio file at the start of each trial (doesn't work yet)
-                    #puts "BEEP"
-                    #playwav /home/imt/imt/robot4/protocols/ankle/VariableDampingStudy/Supporting/go.wav
+                    # Play an audio file at the start of each trial, using a bash script
+                    exec bash /home/imt/imt/robot4/protocols/ankle/VariableDampingStudy/Supporting/playSound.sh &
 
                     # Show text that says "Go!" next to or above the target, depending on whether the trial is DP or IE
       				if {$studyType == "DP"} {
