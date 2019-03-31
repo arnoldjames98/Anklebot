@@ -10,36 +10,37 @@ clear; clc; close all
 columnData = {
     'i', 'no units' % 1
     'time_since_start' , 'ms' % 2
+    
     'pos.ie' , 'rad' % 3
     'pos.dp' , 'rad' % 4
+    
     'vel.ie' , 'rad/s' % 5
     'vel.dp' , 'rad/s' % 6
-    'torque.ie', 'Nm' % 7
-    'torque.dp', 'Nm' % 8
-    'moment_cmd.ie', 'Nm' % 9
-    'moment_cmd.dp', 'Nm' % 10
-    'knee.raw', 'rad' % 11
-    'right.devtrq', 'Nm' % 12
-    'left.devtrq', 'Nm' % 13
-    'right.volts', 'V' % 14
-    'left.volts', 'V' % 15
-    'emg.triggering_signal', 'V' % 16
-    'ankle.perturb_DP', 'no units' % 17
-    'emg.tib_ant', 'V' % 18
-    'emg.per_loin', 'V' % 19
-    'emg.sol', 'V' % 20
-    'emg.meg_gas', 'V' % 21
-    'load_cell.left', 'V' % 22
-    'load_cell.right', 'V' % 23
-    'accel.ie', 'rad/s^2' % 24
-    'accel.dp', 'rad/s^2' % 25
-    'fvel.ie', 'rad/s' % 26
-    'fvel.dp', 'rad/s' % 27
-    'varDamp_K', 'no unit' % 28
-    'damp_IE', 'Nms/rad' % 29
-    'damp_DP', 'Nms/rad' % 30
-    'faccel', 'rad/s^2' % 31
-    'vel_ times_accel', 'unit'}; % 32
+    'fvel.ie', 'rad/s' % 7
+    'fvel.dp', 'rad/s' % 8
+    
+    'accel.ie', 'rad/s^2' % 9
+    'accel.dp', 'rad/s^2' % 10
+    'faccel.ie', 'rad/s^2' % 11
+    'faccel.dp', 'rad/s^2' % 12
+    
+    'torque.ie', 'Nm' % 13
+    'torque.dp', 'Nm' % 14
+    
+    'target_Distance', 'deg' % 15
+
+    'emg.tib_ant', 'V' % 16
+    'emg.per_loin', 'V' % 17
+    'emg.sol', 'V' % 18
+    'emg.meg_gas', 'V' % 19
+    
+    'load_cell.left', 'V' % 20
+    'load_cell.right', 'V' % 21
+    
+    'varDamp_K', 'no unit' % 22
+    'damp_IE', 'Nms/rad' % 23
+    'damp_DP', 'Nms/rad' }; % 24
+
 
 columnCount = length(columnData); % number of columns in .dat files
 headerCount = 13; % number of header lines in .dat files
@@ -62,7 +63,7 @@ black = [0 0 0]; % used for all other trials
 singleF = '%f';
 multipleF = singleF;
 
-% Loop that creates a string of repeated '%f' (ie. '%f%f%f' if 3 columns)
+% Loop that creates a string of repeated "%f" (ie. "%f%f%f" if 3 columns)
 for i = 1:(columnCount-1)
     multipleF = strcat(multipleF, singleF);
 end
@@ -110,29 +111,29 @@ disp('Units corrected.')
 %% Individual Graphing of the Raw Data
 figure
 % Specify what data you want to graph
-graphBlock = 6; % the block of 10 trials whose data is graphed
-graphColumn = 3; % the column of data being graphed
+graphBlock = 3; % the block of 10 trials whose data is graphed
+graphColumn = 23; % the column of data being graphed
 time = eachBlock{graphBlock,1}(:,2);
 
 % Format the graph the labels for readability
-titleBlock = extractBefore(eachBlock{graphBlock,2},'_');
-titleType = extractBetween(eachBlock{graphBlock,2},'_','.');
-titleFull = strcat(titleBlock,' (',titleType, ')');
+titleBlock = extractBefore(eachBlock{graphBlock,2},"_");
+titleType = extractBetween(eachBlock{graphBlock,2},"_",".");
+titleFull = strcat(titleBlock," (",titleType, ")");
 
 xLabelName = strrep(columnData{2, 1},'_',' ');
 xLabelUnits = columnData{2, 2};
-xLabelFull = strcat(xLabelName,' (',xLabelUnits, ')');
+xLabelFull = strcat(xLabelName," (",xLabelUnits, ")");
 
 yLabelName = strrep(columnData{graphColumn, 1},'_',' ');
 yLabelUnits = columnData{graphColumn, 2};
-yLabelFull = strcat(yLabelName,' (',yLabelUnits, ')');
+yLabelFull = strcat(yLabelName," (",yLabelUnits, ")");
 
 % Selecting the appropriate color for the graph
-if titleType == 'positive'
+if titleType == "positive"
     plotColor = green;
-elseif titleType == 'negative'
+elseif titleType == "negative"
         plotColor = orange;
-elseif titleType == 'variable'
+elseif titleType == "variable"
     plotColor = blue;
 else
     plotColor = black;
@@ -148,7 +149,7 @@ grid on
 
 % Graph signal that specifies the start of the trials
 hold on
-plot(time,eachBlock{graphBlock,1}(:,17),'color',black)
+plot(time,eachBlock{graphBlock,1}(:,15),'color',black)
 
 %% Subplot Graphing of the Raw Data
 figure
@@ -159,24 +160,24 @@ for i = 1:blocksCount % Creates a graph within a subplot for each block
     time = eachBlock{i,1}(:,2);
     
     % Format the graph the labels for readability
-    titleBlock = extractBefore(eachBlock{i,2},'_');
-    titleType = extractBetween(eachBlock{i,2},'_','.');
-    titleFull = strcat(titleBlock,' (',titleType, ')');
+    titleBlock = extractBefore(eachBlock{i,2},"_");
+    titleType = extractBetween(eachBlock{i,2},"_",".");
+    titleFull = strcat(titleBlock," (",titleType, ")");
 
     xLabelName = strrep(columnData{2, 1},'_',' ');
     xLabelUnits = columnData{2, 2};
-    xLabelFull = strcat(xLabelName,' (',xLabelUnits, ')');
+    xLabelFull = strcat(xLabelName," (",xLabelUnits, ")");
 
     yLabelName = strrep(columnData{graphColumn, 1},'_',' ');
     yLabelUnits = columnData{graphColumn, 2};
-    yLabelFull = strcat(yLabelName,' (',yLabelUnits, ')');
+    yLabelFull = strcat(yLabelName," (",yLabelUnits, ")");
 
     % Selecting the appropriate color for the graph
-    if titleType == 'positive'
+    if titleType == "positive"
         plotColor = green;
-    elseif titleType == 'negative'
+    elseif titleType == "negative"
         plotColor = orange;
-    elseif titleType == 'variable'
+    elseif titleType == "variable"
         plotColor = blue;
     else
         plotColor = black;
@@ -192,7 +193,7 @@ for i = 1:blocksCount % Creates a graph within a subplot for each block
     grid on
 
     hold on
-    plot(time,eachBlock{i,1}(:,17),'color',black)
+    plot(time,eachBlock{i,1}(:,15),'color',black)
 
     title(titleFull);
     xlabel(xLabelFull);
@@ -205,7 +206,8 @@ for i = 1:blocksCount % Creates a graph within a subplot for each block
     '    ''ButtonDownFcn'', ''delete(get(gca, ''''Parent''''))''); ']);
     
 end
-%% Breaking the blocks into trials
+
+%% Breaking trials into blocks (using target distance, not start signal)
 totalTrials = 0;
 eachTrial = cell(blocksCount*trialPerBlockCount,3);
 
@@ -213,44 +215,41 @@ for i = 1:blocksCount
     trialInBlock = 0;
 
     time = eachBlock{i,1}(:,2);
-    inputSignal = eachBlock{i,1}(:,17);
-    %figure
-    %plot(time,eachBlock{i,1}(:,graphColumn),'linewidth',1.5,'color',plotColor)
-                %hold on
+    inputSignal = eachBlock{i,1}(:,15);
     
-    % Find the each of the trials within the block
-    step = 1;
-    while step < length(time)
-        if 9.5 < inputSignal(step) && inputSignal(step) < 10.5 ...
-                && trialInBlock < trialPerBlockCount
-            %plot(time(step),10,'b*')
+    figure
+    %plot(time,eachBlock{i,1}(:,3),'linewidth',1.5,'color',plotColor)
+    %hold on
+    plot(time,inputSignal,'color',black)
+    hold on
+    trialStart = [0; diff(inputSignal==0)];
+    plot(time, trialStart)
+    
+    for j = 1:length(trialStart)
+        if trialStart(j) == -1
+            % Trial is identified
             totalTrials = totalTrials + 1;
-            trialInBlock = trialInBlock + 1;
-            
-            % Extract data about each trial
-            titleType = extractBetween(eachBlock{i,2},'_','.');
             
             % Eversion (+) or inversion (-)
-            if mod(totalTrials,2) == 1
+            if inputSignal(j) > 0   
+                plot(time(j),inputSignal(j),'b*')
                 trialDirection = 'eversion';
-            else
+            else 
+                plot(time(j),inputSignal(j),'r*')
                 trialDirection = 'inversion';
             end
             
-            % Put the data into the cell array
-            %trialTime = 1999;
+            % Determine what is the damping enviornment
+            titleType = extractBetween(eachBlock{i,2},"_",".");
             
-            eachTrial{totalTrials,1} = eachBlock{i,1}(step:step+trialTime-1,:); % Each matrix of data
+            % Create the cell array of every trial
+            eachTrial{totalTrials,1} = eachBlock{i,1}(j:j+trialTime-1,:); % Each matrix of data
             eachTrial{totalTrials,2} = char(titleType); % Trial type
             eachTrial{totalTrials,3} = trialDirection; % Direction
             
-            % Since the input signal stays for more than 1 time step
-            step = step + 100;
-        else
-        % If no input signal found, check the next time step
-        step = step + 1;
         end
     end
+    
 end
 
 disp('Number of identified trials:')
@@ -262,7 +261,7 @@ figure
 graphColumn = 3;
 
 % Plots every trial
-for i = 1:190
+for i = 1:(trialPerBlockCount*blocksCount)
     plot(eachTrial{i,1}(:,graphColumn))
     grid on
     drawnow
@@ -273,7 +272,7 @@ title('All Trials')
 
 yLabelName = strrep(columnData{graphColumn, 1},'_',' ');
 yLabelUnits = columnData{graphColumn, 2};
-yLabelFull = strcat(yLabelName,' (',yLabelUnits, ')');
+yLabelFull = strcat(yLabelName," (",yLabelUnits, ")");
     
 ylabel(yLabelFull)
 
@@ -296,7 +295,7 @@ title(direction)
 
 yLabelName = strrep(columnData{graphColumn, 1},'_',' ');
 yLabelUnits = columnData{graphColumn, 2};
-yLabelFull = strcat(yLabelName,' (',yLabelUnits, ')');
+yLabelFull = strcat(yLabelName," (",yLabelUnits, ")");
     
 ylabel(yLabelName)
 
@@ -307,8 +306,8 @@ graphColumn = 3; % Specify what data you want to graph (columnData)
 subplotRows = 3; % Number of rows of plots
 subplotColumns = 2; % Number of columns of plots
 
-dampingEnviornments = ['positive', 'negative', 'variable'];
-movementDirections = ['eversion', 'inversion'];
+dampingEnviornments = ["positive", "negative", "variable"];
+movementDirections = ["eversion", "inversion"];
 
 % Create a new figure
 figure
@@ -334,12 +333,12 @@ for type = dampingEnviornments
             
             % Find and graph each trials data as colored lines
             plot(eachTrial{i,1}(:,graphColumn))
-            title(strcat(type, ' ', direction));
+            title(strcat(type, " ", direction));
             
             % Generate and label the y axis of the plot
             yLabelName = strrep(columnData{graphColumn, 1},'_',' ');
             yLabelUnits = columnData{graphColumn, 2};
-            yLabelFull = strcat(yLabelName,' (',yLabelUnits, ')');
+            yLabelFull = strcat(yLabelName," (",yLabelUnits, ")");
             ylabel(yLabelFull)
             
             grid on
@@ -362,8 +361,8 @@ end
 graphColumn = 3; % Specify what data you want to graph (columnData)
 subplotRows = 3; % Number of rows of plots
 subplotColumns = 2; % Number of columns of plots
-dampingEnviornments = ['positive', 'negative', 'variable'];
-movementDirections = ['eversion', 'inversion'];
+dampingEnviornments = ["positive", "negative", "variable"];
+movementDirections = ["eversion", "inversion"];
 opacity = 0.8; % Visibility of each trial line (set to 1 to hide)
 
 % Create a new figure
@@ -374,11 +373,11 @@ plotIndex = 0; % For placing the subplots
 % Nested for loop that creates each subplot
 for type = dampingEnviornments
     % Selecting the appropriate color for the graph
-    if type == 'positive'
+    if type == "positive"
         plotColor = green;
-    elseif type == 'negative'
+    elseif type == "negative"
         plotColor = orange;
-    elseif type == 'variable'
+    elseif type == "variable"
         plotColor = blue;
     else
         plotColor = black;
@@ -410,7 +409,7 @@ for type = dampingEnviornments
             
             % When graphing position, fix the axis for easy comparison
             if graphColumn == 3
-                if direction == 'inversion'
+                if direction == "inversion"
                     ylim([-20 5]);
                 else 
                     ylim([-5 20]);
@@ -422,12 +421,12 @@ for type = dampingEnviornments
             meanMatrixIndex = meanMatrixIndex + 1; 
             
             % Generate the title
-            title(strcat(type, ' ', direction));
+            title(strcat(type, " ", direction));
             
             % Generate and label the y axis of the plot
             yLabelName = strrep(columnData{graphColumn, 1},'_',' ');
             yLabelUnits = columnData{graphColumn, 2};
-            yLabelFull = strcat(yLabelName,' (',yLabelUnits, ')');
+            yLabelFull = strcat(yLabelName," (",yLabelUnits, ")");
             ylabel(yLabelFull)
             
             grid on
@@ -454,8 +453,8 @@ end
 % Section parameters
 subplotRows = 3; % Number of rows of plots
 subplotColumns = 2; % Number of columns of plots
-dampingEnviornments = ['variable', 'intent', 'damping'];
-movementDirections = ['eversion', 'inversion'];
+dampingEnviornments = ["variable", "intent", "damping"];
+movementDirections = ["eversion", "inversion"];
 opacity = 0.8; % Visibility of each trial line (set to 1 to hide)
 
 % Variable damping parameters
@@ -470,11 +469,11 @@ plotIndex = 0; % For placing the subplots
 % Nested for loop that creates each subplot
 for type = dampingEnviornments
     % Selecting the appropriate color for the graph
-    if type == 'variable'
+    if type == "variable"
         plotColor = blue;
-    elseif type == 'intent'
+    elseif type == "intent"
         plotColor = purple;
-    elseif type == 'damping'
+    elseif type == "damping"
         plotColor = purple;
     else
         plotColor = black;
@@ -488,7 +487,7 @@ for type = dampingEnviornments
         directionSet = find(strcmp(eachTrial(:,3), direction));
         
         % Always sets the type to variable
-        typeSet = find(strcmp(eachTrial(:,2), 'variable'));
+        typeSet = find(strcmp(eachTrial(:,2), "variable"));
 
         % Find the entries in eachTrial that meet the criteria
         intersectionSet = intersect(directionSet, typeSet);
@@ -503,18 +502,18 @@ for type = dampingEnviornments
             subplot(subplotRows,subplotColumns,plotIndex)
             
             % Find and graph each trials data as light grey lines
-            if type == 'variable'
+            if type == "variable"
                 graphColumn = 3;
                 y = eachTrial{i,1}(:,graphColumn); % varaible position
-            elseif type == 'intent'
-                filteredVelocity = (eachTrial{i,1}(:,26));
-                filteredAcceleration = (eachTrial{i,1}(:,31));
+            elseif type == "intent"
+                filteredVelocity = (eachTrial{i,1}(:,7));
+                filteredAcceleration = (eachTrial{i,1}(:,11));
                 y = filteredVelocity.*filteredAcceleration;
-            elseif type == 'damping'
-                graphColumn = 29;
+            elseif type == "damping"
+                graphColumn = 23;
                 y = (eachTrial{i,1}(:,graphColumn));
-                k = eachTrial{i,1}(1,28);
-                disp(k)
+                k = eachTrial{i,1}(1,22);
+                %disp(k)
             end
             
             plot(y, 'color',black+opacity) % color+opacity 
@@ -524,20 +523,20 @@ for type = dampingEnviornments
             meanMatrixIndex = meanMatrixIndex + 1; 
             
             % Generate the title (unique for damping)
-            if type == 'damping'
-                title(strcat(type, ' ', direction, ' (k = ', num2str(k), ')'));
+            if type == "damping"
+                title(strcat(type, " ", direction, " (k = ", num2str(k), ")"));
             else
-                title(strcat(type, ' ', direction));
+                title(strcat(type, " ", direction));
             end
             
             % Generate and label the y axis of the plot
             % Intent is calculated, not found in columnData
-            if type == 'intent'
-                ylabel('intent (rad^2/s^3)') % user intent units
+            if type == "intent"
+                ylabel("intent (rad^2/s^3)") % user intent units
             else 
                 yLabelName = strrep(columnData{graphColumn, 1},'_',' ');
                 yLabelUnits = columnData{graphColumn, 2};
-                yLabelFull = strcat(yLabelName,' (',yLabelUnits, ')');
+                yLabelFull = strcat(yLabelName," (",yLabelUnits, ")");
                 ylabel(yLabelFull)
             end
             
