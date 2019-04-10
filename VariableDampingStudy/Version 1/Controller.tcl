@@ -271,25 +271,19 @@ proc endBlock {currentBlock} {
 	global ob
   global calculatingK
   global enablingVariableDamping
-  global kMatrixPos
-  global kMatrixNeg
-  global selectedK_pos
-  global selectedK_neg
+  global kMatrix
+  global selectedK
 
 	puts "End of block $currentBlock"
 
   if {$calculatingK == 1} {
     # Calculate the average gravity
     proc lavg L {expr ([join $L +])/[llength $L].}
-    set selectedK_pos [lavg $kMatrixPos]
-    set selectedK_neg [lavg $kMatrixNeg]
-    puts "Here is the selected K from the previous block, for positive intent:"
-    puts $selectedK_pos
-    puts "Here is the selected K from the previous block, for negative intent:"
-    puts $selectedK_neg
+    set selectedK [lavg $kMatrix]
+    puts "Here is the selected K from the previous block:"
+    puts $selectedK
     #Reset kMatrix for next average
-    set kMatrixPos { }
-	set kMatrixNeg { }
+    set kMatrix { }
 
   }
 
@@ -337,13 +331,10 @@ proc endTrial {currentTrial} {
   global graphMatrix
   global maxMinPoints
   global maxVal
-  global minVal
   global b_LB
   global b_UB
-  global kMatrixPos
-  global kMatrixNeg
+  global kMatrix
   global va_max
-  global va_min
   global variableDampingRange
 
   # Find the current damping enviornment
@@ -359,27 +350,20 @@ proc endTrial {currentTrial} {
     foo data d1 -colour red -points 1 -lines 0 -coords $maxMinPoints
     # Graph the velocity times acceleration data as a line on the graph
     foo data d2 -colour blue -points 0 -lines 1 -coords $graphMatrix
-	
+
     # Finds the parameters for finding k
     set r 0.95
-    
     set va_max $maxVal
-    set va_min $minVal
-
     set b_UB [lindex $variableDampingRange 1]
     set b_LB [lindex $variableDampingRange 0]
 
-    # Calculation of k (one for positive intent, one for negative intent)
-    set new_k_pos [expr {-log((1-$r)/(1+$r)) / $va_max}]
-    set new_k_neg [expr {-log((1+$r)/(1-$r)) / $va_min}]
-
+    # Calculation of k
+    set new_k [expr {-log((1-$r)*$b_LB/ ($r*$b_LB - $b_UB)) / $va_max}]
+    
     # Create a matrix of all of k values for the block
-    lappend kMatrixPos $new_k_pos
-    lappend kMatrixNeg $new_k_neg
-    puts "Here is the new k matrix for positive intent:"
-    puts $kMatrixPos
-    puts "Here is the new k matrix for negative intent:"
-    puts $kMatrixNeg
+    lappend kMatrix $new_k
+    puts "Here is the new k matrix:"
+    puts $kMatrix
   }
 }
 
@@ -491,11 +475,13 @@ every 10 {
   global minVal
   global maxTime
   global minTime
+  global new_k
+  global kMatrix
+  global avg_k
   global maxMinPoints
   global b_UB
   global b_LB
-  global selectedK_pos
-  global selectedK_neg
+  global selectedK
 
   # When k is being calculated OR variable damping is enabled, need to find vel and accel
   if {$calculatingK == 1 || $enablingVariableDamping == 1} {
@@ -530,9 +516,8 @@ every 10 {
       set maxVal -999999899 
       set minVal 999999899 
       set maxTime 0
-      set minTime 0
 
-    # If the target is set at a distance, this is the data being used to calculate k
+    # If the target is set at a distance, this is the data being used to calculat k
     # Data is being used for calculation of K
     } else {
       #puts "k is being calculated from the current data"
@@ -575,22 +560,9 @@ every 10 {
     #puts "accel: $accel rad^2/s"
     #puts "constantK: $constantK"
 
-    # Each time step, calculate filtered velocity times filtered acceleration
-    set vtimesa [ expr {$vel * $accel} ]
-
-    # Damping for positive intent
-    if { $vtimesa >= 0 } {
-    	# Send the selected variable damping k to the log
-    	wshm ankle_varDamp_K $selectedK_pos
-    	set damping [ expr { ( 2 * $b_LB ) / (1 + exp( (-1) * $selectedK_pos * $vel * $accel) ) - $b_LB } ]
-    	applyDamping $damping
-
-    # Damping for negative intent
-    } else {
-    	# Send the selected variable damping k to the log
-    	wshm ankle_varDamp_K $selectedK_neg
-    	set damping [ expr { (-1) * ( ( 2 * $b_UB ) / (1 + exp( (-1) * $selectedK_neg * $vel * $accel) ) - $b_UB ) } ]
-    	applyDamping $damping
-    }
+    # Send the selected variable damping k to the log
+    wshm ankle_varDamp_K $selectedK
+    set damping [ expr { ( $b_UB - $b_LB ) * (-1) / (1 + exp( (-1) * $selectedK *$vel * $accel) ) + $b_UB } ]
+    applyDamping $damping
   }
 }
