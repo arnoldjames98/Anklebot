@@ -9,15 +9,15 @@ bind . <Key-q> done
 # ---------------Study Specifications------------------
 
 # Either DP or IE
-set studyType "DP"
+set studyType "IE"
 
 # Damping environments and the number of blocks for each (place in order)
-set dampingEnvironments [list {zero 1} {tuning 3} {variable 5} {negative 5} {positive 5}]
+set dampingEnvironments [list {zero 1} {tuning 3} {variable 1} {negative 1} {positive 1} {variable 2} {negative 2} {positive 2} {variable 2} {negative 2} {positive 2}]
 # Number of trials in a block, should be even in order to ensure equal number of trials in both directions
 set trialsPerBlock 10
 # Damping values
-set negativeDamping -1
-set positiveDamping 2
+set negativeDamping -0.5
+set positiveDamping 1
 set variableDampingRange [list $negativeDamping $positiveDamping]
 
 # Initialized list of every damping enviorment in order
@@ -204,7 +204,7 @@ gets stdin in
 
 # Find the current position of the ankle
 set x [rshm ankle_ie_pos]
-set y [rshm ankle_dp_pos]
+set y [rshm ankle_dp_pos]setDampingEnvironment
 
 # Without the following line, none of the stiffness values are set
 movebox 0 $ob(ankle_ctl_independent) {0 $Hz 1} {$x $y 0 0} {0 0 0 0}
@@ -246,6 +246,7 @@ proc applyStiffness {} {
       puts "Stiffness applied"
 	}
 }
+
 
 # Start trials
 proc startTrials {} {
@@ -398,7 +399,7 @@ proc setDampingEnvironment {currentBlock} {
 
   # Apply the appropriate damping based on the current damping environment
   if {$currentDampingEnvironment == "zero"} {
-    applyDamping 0
+    applyDamping 0.2
     set calculatingK 1
 
   } elseif {$currentDampingEnvironment == "tuning"} {

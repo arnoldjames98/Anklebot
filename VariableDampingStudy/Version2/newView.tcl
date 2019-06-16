@@ -3,12 +3,12 @@
 
 package require Tk
 #package provide snack 2.2 (doesn't work yet)
-source Controller.tcl
+source newController.tcl
 
 # ---------------Study Specifications------------------
 
 # Degrees from the center for the target
-set targetDistance 10
+set targetDistance 7.5
 
 # Time required to meet targets, in ms
 set targetTime 2000
@@ -215,23 +215,44 @@ proc buttonAction {place} {
 }
 
 # Function that generates the postion of the target for each trial
+
+set direction rand()
 proc targetPosition {trials} {
     global targetDistance
     global targetPositionsInBlock
+    global trialsPerBlock
+    global blocks
+    global direction
+   
+
+    set directionList [list -1 1 -1 -1 -1 1 1 -1 1 1]
+    set direction 0
+    set listLength [llength $directionList]
 
     # Each trial after the intial neutral is either {1, 0} or {-1, 0} for going to the target and returning
-    for {set i 0} {$i <= [expr $trials -1]} {incr i} {
-        if {[expr $i % 2] == 0} {
-            lappend targetPositionsInBlock [expr 1 * $targetDistance]
-        } else {
-            lappend targetPositionsInBlock [expr -1 * $targetDistance]
-        }
-        lappend targetPositionsInBlock 0
-    }
+    for {set i 0} {$i <= [ expr {$trials - 1}]} {incr i} {
 
-    # Ouputs the final vector in the form of {0, 1, 0, -1, 0, 1...}*targetDistance
+        
+        if {$direction < 0.5} {
+
+            lappend targetPositionsInBlock [expr {int([lindex $directionList 0] * $targetDistance)} ]
+            set directionList [lreplace $directionList 0 0]
+            set listLength [llength $directionList]
+        } else {
+
+            lappend targetPositionsInBlock [expr {int([lindex $directionList [expr {int($listLength - 1)}]] * $targetDistance)}]
+            set directionList [lreplace $directionList [expr {$listLength - 1}] [expr {$listLength - 1}]]
+            set listLength [llength $directionList]
+        }
+
+        lappend targetPositionsInBlock 0 
+        set direction rand()
+    }
     list $targetPositionsInBlock
 }
+
+    # Ouputs the final vector in the form of {0, 1, 0, -1, 0, 1...}*targetDistance
+    
 
 # Function that generates a random interger in a range
 proc randomInRange {range} {

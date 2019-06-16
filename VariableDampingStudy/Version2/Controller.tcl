@@ -9,15 +9,15 @@ bind . <Key-q> done
 # ---------------Study Specifications------------------
 
 # Either DP or IE
-set studyType "DP"
+set studyType "IE"
 
 # Damping environments and the number of blocks for each (place in order)
 set dampingEnvironments [list {zero 1} {tuning 3} {variable 5} {negative 5} {positive 5}]
 # Number of trials in a block, should be even in order to ensure equal number of trials in both directions
 set trialsPerBlock 10
 # Damping values
-set negativeDamping -1
-set positiveDamping 2
+set negativeDamping -0.5
+set positiveDamping 1
 set variableDampingRange [list $negativeDamping $positiveDamping]
 
 # Initialized list of every damping enviorment in order
@@ -238,7 +238,7 @@ proc applyStiffness {} {
 	global studyType
   	if {$studyType == "DP"} {
   		wshm ankle_stiff_DP 0.0
-  		wshm ankle_stiff_IE 200.0
+  		wshm ankle_stiff_IE 400.0
       puts "Stiffness applied"
   	} elseif {$studyType == "IE"} {
   		wshm ankle_stiff_DP 400.0
