@@ -54,12 +54,6 @@ set insideTargetColor "#FFD45C"
 
 # -------------------Functions------------------------
 
-# Play a .wav audio file (does't work yet)
-#proc playwav myWavFile { 
-#    snack::sound s -file $myWavFile
-#    s play -block 1
-#}
-
 # Draw a gradient (used for the background of the canvas)
 proc drawGradient {win axis col1Str col2Str} {
     if {[winfo class $win] != "Canvas"} {
