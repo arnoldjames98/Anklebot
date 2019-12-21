@@ -9,7 +9,7 @@ bind . <Key-q> done
 # ---------------Study Specifications------------------
 
 # Either DP or IE
-set studyType "IE"
+set studyType "2D"
 
 # Damping environments and the number of blocks for each (place in order)
 set dampingEnvironments [list {zero 1} {tuning 3} {variable 1} {negative 1} {positive 1} {variable 2} {negative 2} {positive 2} {variable 2} {negative 2} {positive 2}]
@@ -244,6 +244,10 @@ proc applyStiffness {} {
   		wshm ankle_stiff_DP 400.0
   		wshm ankle_stiff_IE 0.0
       puts "Stiffness applied"
+	} elseif {$studyType == "2D"} {
+		wshm ankle_stiff_DP 0.0
+  		wshm ankle_stiff_IE 0.0
+      puts "2D Stiffness applied"
 	}
 }
 
@@ -311,6 +315,9 @@ proc endBlock {currentBlock} {
 		if {$studyType == "DP"} {
       wshm ankle_stiff_DP 200.0
     } elseif {$studyType == "IE"} {
+      wshm ankle_stiff_IE 200.0
+    } elseif {$studyType == "2D"} {
+      wshm ankle_stiff_DP 200.0
       wshm ankle_stiff_IE 200.0
     }
 
