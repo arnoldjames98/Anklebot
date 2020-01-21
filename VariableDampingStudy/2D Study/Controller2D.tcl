@@ -8,11 +8,12 @@ bind . <Key-q> done
 
 # ---------------Study Specifications------------------
 
-# Either DP or IE
-set studyType "2D"
+# Either DP, IE, or 2D
+# Initially set to IE since block 1 is set to be a tuning trial in the IE direction
+set targetOrientation "IE"
 
 # Damping environments and the number of blocks for each (place in order)
-set dampingEnvironments [list {zero 1} {tuning 3} {variable 1} {negative 1} {positive 1} {variable 2} {negative 2} {positive 2} {variable 2} {negative 2} {positive 2}]
+set dampingEnvironments [list {zero 1} {tuning 1} {zero 1} {tuning 1} {positive 5} {negative 5} {variable 5}]
 # Number of trials in a block, should be even in order to ensure equal number of trials in both directions
 set trialsPerBlock 10
 # Damping values
@@ -204,7 +205,7 @@ gets stdin in
 
 # Find the current position of the ankle
 set x [rshm ankle_ie_pos]
-set y [rshm ankle_dp_pos]setDampingEnvironment
+set y [rshm ankle_dp_pos]
 
 # Without the following line, none of the stiffness values are set
 movebox 0 $ob(ankle_ctl_independent) {0 $Hz 1} {$x $y 0 0} {0 0 0 0}
@@ -235,16 +236,16 @@ proc gravityComp {} {
 
 # Used at the start of the trials to limit the subjects motion to the plane of interest
 proc applyStiffness {} {
-	global studyType
-  	if {$studyType == "DP"} {
+	global targetOrientation
+  	if {$targetOrientation == "DP"} {
   		wshm ankle_stiff_DP 0.0
   		wshm ankle_stiff_IE 200.0
       puts "Stiffness applied"
-  	} elseif {$studyType == "IE"} {
+  	} elseif {$targetOrientation == "IE"} {
   		wshm ankle_stiff_DP 400.0
   		wshm ankle_stiff_IE 0.0
       puts "Stiffness applied"
-	} elseif {$studyType == "2D"} {
+	} elseif {$targetOrientation == "2D"} {
 		wshm ankle_stiff_DP 0.0
   		wshm ankle_stiff_IE 0.0
       puts "2D Stiffness applied"
@@ -270,7 +271,7 @@ proc startTrials {} {
 # Apply the correct amount of damping based on the block number
 proc endBlock {currentBlock} {
   global blocks
-	global studyType
+	global targetOrientation
 	global subjectName
 	global everyBlockEnvironment
 	global ob
@@ -280,6 +281,16 @@ proc endBlock {currentBlock} {
   global kMatrixNeg
   global selectedK_pos
   global selectedK_neg
+
+  global targetPositionsInBlock
+  global targetPositionsInBlock_X
+  global targetPositionsInBlock_Y
+
+  global targetPositionsInBlock2_IE
+  global targetPositionsInBlock3_DP
+  global targetPositionsInBlock4_DP
+  global targetPositionsInBlock5_X
+  global targetPositionsInBlock5_Y
 
 	puts "End of block $currentBlock"
 
@@ -312,11 +323,11 @@ proc endBlock {currentBlock} {
 		puts "Take a 1 minute break"
 
     # Prevent the subject from moving from the neutral position during the break
-		if {$studyType == "DP"} {
+		if {$targetOrientation == "DP"} {
       wshm ankle_stiff_DP 200.0
-    } elseif {$studyType == "IE"} {
+    } elseif {$targetOrientation == "IE"} {
       wshm ankle_stiff_IE 200.0
-    } elseif {$studyType == "2D"} {
+    } elseif {$targetOrientation == "2D"} {
       wshm ankle_stiff_DP 200.0
       wshm ankle_stiff_IE 200.0
     }
@@ -324,13 +335,44 @@ proc endBlock {currentBlock} {
     # Pause the study until enter is pressed
     puts "Press ENTER to continue"
     gets stdin in
-    	
+
+
+
+    #Specifications for each block after 1
+    # Block 2
+    if {[expr $currentBlock + 1] == 2} {
+      set targetOrientation "IE"
+      set targetPositionsInBlock $targetPositionsInBlock2_IE
+      puts "IE NEW TARGET LOCATIONS"
+    }
+    # Block 3
+    if {[expr $currentBlock + 1] == 3} {
+      set targetOrientation "DP"
+      set targetPositionsInBlock $targetPositionsInBlock3_DP
+      puts "DP NEW TARGET LOCATIONS"
+    }
+    # Block 4
+    if {[expr $currentBlock + 1] == 4} {
+      set targetOrientation "DP"
+      set targetPositionsInBlock $targetPositionsInBlock4_DP
+      puts "DP NEW TARGET LOCATIONS"
+    }
+    # Block 5
+    if {[expr $currentBlock + 1] == 5} {
+      # TODO: MAKE ALL OF THESE VARIABLES WORK AND HAVE MEANING
+      set targetOrientation "2D"
+      set targetPositionsInBlock_X targetPositionsInBlock5_X
+      set targetPositionsInBlock_Y targetPositionsInBlock5_Y
+      puts "2D NEW TARGET LOCATIONS"
+    }	
+
     # Remove the appropriate stiffness to continue the trials
     applyStiffness
 
     # Apply the appropriate damping based on the current block
     setDampingEnvironment [expr $currentBlock + 1]
-    puts $currentBlock
+    puts "Here is the current block:"
+    puts [expr $currentBlock + 1]
 
     logSetup $subjectName [join [list "_" [lindex $everyBlockEnvironment $currentBlock]]]
 		start_log $ob(logf) $ob(nlog)
@@ -385,10 +427,10 @@ proc endTrial {currentTrial} {
     # Create a matrix of all of k values for the block
     lappend kMatrixPos $new_k_pos
     lappend kMatrixNeg $new_k_neg
-    puts "Here is the new k matrix for positive intent:"
-    puts $kMatrixPos
-    puts "Here is the new k matrix for negative intent:"
-    puts $kMatrixNeg
+    #puts "Here is the new k matrix for positive intent:"
+    #puts $kMatrixPos
+    #puts "Here is the new k matrix for negative intent:"
+    #puts $kMatrixNeg
   }
 }
 
@@ -430,14 +472,14 @@ proc setDampingEnvironment {currentBlock} {
 }
 
 proc applyDamping {damping} {
-  global studyType
+  global targetOrientation
   #puts "Damping of $damping Nms/rad"
-  if {$studyType == "DP"} {
+  if {$targetOrientation == "DP"} {
     # Apply the input constant damping
     wshm ankle_damp_DP $damping
     # Apply positive daming to the direction opposite of movement
     wshm ankle_damp_IE 1.0
-  } elseif {$studyType == "IE"} {
+  } elseif {$targetOrientation == "IE"} {
     # Apply positive daming to the direction opposite of movement
     wshm ankle_damp_DP 1.0
     # Apply the input constant damping
@@ -492,7 +534,7 @@ every 10 {
   global calculatingK
   global enablingVariableDamping
   global variableDampingRange
-  global studyType
+  global targetOrientation
   global xtime
   global graphMatrix
   global vtimesaMatrix
@@ -510,10 +552,10 @@ every 10 {
   if {$calculatingK == 1 || $enablingVariableDamping == 1} {
     #puts "calculating vel and accel"
     # Find the current filtered velocity and acceleration
-    if {$studyType == "DP"} {
+    if {$targetOrientation == "DP"} {
       set vel [rshm ankle_dp_fvel]
       set accel [rshm ankle_dp_faccel]
-    } elseif {$studyType == "IE"} {
+    } elseif {$targetOrientation == "IE"} {
       set vel [rshm ankle_ie_fvel]
       set accel [rshm ankle_ie_faccel]
     }

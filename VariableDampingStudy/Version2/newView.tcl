@@ -249,6 +249,7 @@ proc targetPosition {trials} {
         set direction rand()
     }
     list $targetPositionsInBlock
+    puts $targetPositionsInBlock
 }
 
     # Ouputs the final vector in the form of {0, 1, 0, -1, 0, 1...}*targetDistance

@@ -7,14 +7,13 @@ source Controller2D.tcl
 # ---------------Study Specifications------------------
 
 # Degrees from the center for the target
+# This study uses different, prerandomized target distances for each trial, so not needed
 #set targetDistance 7.5
-set targetDistanceRangeDP [list 0 20]
-set targetDistanceRangeIE [list 0 10]
 
 # Time required to meet targets, in ms
 set targetTime 2000
-# No time randomization in this study
-#set neutralTimeRange [list 1500 4000] 
+# No time randomization in this study, but still used for tuning trials
+set neutralTimeRange [list 1500 4000] 
 
 # Radii of the cursor and target in degrees
 set cursorRadius 1
@@ -32,7 +31,7 @@ set canvasWidth 980
 set canvasHeight $canvasWidth
 
 # Number of degrees to show over the full width and height (ie. -20 to 20 is a degreeRange of 40)
-set degreeRange 50
+set degreeRange 40
 
 # Spacing in degrees of the background grid
 set gridSpacing 1
@@ -45,11 +44,11 @@ set buttonList {"Gravity" "Start"}
 
 # Colors
 set black "#000000"
-set backgroundColor1 "#B3DB8E"
-set backgroundColor2 "#F3FFE0"
+set backgroundColor1 "#CCF2F2"
+set backgroundColor2 "#7ADDDD"
 set cursorColor "#DF0E39"
 set targetColor "#00B0F0"
-set gridColor "#A0B58B"
+set gridColor "#97B2B5"
 set insideTargetColor "#FFD45C"
 
 # -------------------Functions------------------------
@@ -91,6 +90,7 @@ proc drawGradient {win axis col1Str col2Str} {
     set bRatio [expr $bRange / $max]
 
     for {set i 0} {$i < $max} {incr i} {
+    	puts "drawGradient"
         set nR [expr int( $r1 + ($rRatio * $i) )]
         set nG [expr int( $g1 + ($gRatio * $i) )]
         set nB [expr int( $b1 + ($bRatio * $i) )]
@@ -195,7 +195,8 @@ proc buttonAction {place} {
         set target [.right.view create oval [drawCircle 0 0 $targetRadius ] -fill $targetColor -outline $black -width 0]
 
         # Generate a vector representing the position of the target during each block
-        set targetPositionsInBlock [targetPosition $trialsPerBlock]
+        # This function is no longer used since target directions are predefined
+        #set targetPositionsInBlock [targetPosition $trialsPerBlock]
 
         # Starts the study within the loop
         set studyStarted 1
@@ -210,50 +211,71 @@ proc buttonAction {place} {
     }
 }
 
-# Function that generates the postion of the target for each trial
+# Target Positions in the tuning blocks
+# These are both for the x direction
+set targetPositionsInBlock1_IE [list 0.000 2.908 0.000 -6.122 0.000 -2.903 0.000 5.172 0.000 -7.490 0.000 6.866 0.000 -5.535 0.000 4.507 0.000 -5.440 0.000 4.283 0.000]
+set targetPositionsInBlock2_IE [list 0.000 -5.939 0.000 5.330 0.000 3.508 0.000 -5.096 0.000 -4.852 0.000 2.801 0.000 7.195 0.000 -2.609 0.000 5.918 0.000 -2.840 0.000]
+# These are both for the y direction
+set targetPositionsInBlock3_DP [list 0.000 7.013 0.000 -10.296 0.000 -5.578 0.000 -7.589 0.000 6.240 0.000 -14.088 0.000 6.001 0.000 5.397 0.000 -10.520 0.000 12.875 0.000]
+set targetPositionsInBlock4_DP [list 0.000 6.076 0.000 -8.349 0.000 7.239 0.000 10.420 0.000 -10.900 0.000 -14.830 0.000 7.944 0.000 -13.296 0.000 -7.408 0.000 7.746 0.000]
 
-set direction rand()
-proc targetPosition {trials} {
-    global targetDistance
-    global targetPositionsInBlock
-    global trialsPerBlock
-    global blocks
-    global direction
-   
+# The rest are pairs of x and y vectors cooresponding to the following 15 blocks
+# First set of 5 pairs
+set targetPositionsInBlock5_X [list 0.000 6.953 2.507 -7.211 2.270 -4.031 5.762 -6.789 -2.364 4.420 -6.678 0.000]
+set targetPositionsInBlock5_Y [list 0.000 -13.731 2.593 -4.169 14.244 -2.895 -12.172 -3.029 7.079 1.347 11.809 0.000]
 
-    set directionList [list -1 1 -1 -1 -1 1 1 -1 1 1]
-    set direction 0
-    set listLength [llength $directionList]
+set targetPositionsInBlock6_X [list 0.000 2.504 6.506 -0.232 7.077 -0.679 -3.800 5.743 1.483 5.996 -4.415 0.000]
+set targetPositionsInBlock6_Y [list 0.000 -12.838 9.329 -2.489 14.639 -3.333 8.533 1.749 -10.534 -1.488 11.990 0.000]
 
-    # Each trial after the intial neutral is either {1, 0} or {-1, 0} for going to the target and returning
-    for {set i 0} {$i <= [ expr {$trials - 1}]} {incr i} {
+set targetPositionsInBlock7_X [list 0.000 -3.807 3.335 -6.593 -2.637 -7.325 1.967 5.390 1.063 -6.434 5.816 0.000]
+set targetPositionsInBlock7_Y [list 0.000 13.527 -2.998 -10.970 -5.948 1.197 -10.605 14.227 1.606 -5.080 -13.061 0.000]
 
-        
-        if {$direction < 0.5} {
+set targetPositionsInBlock8_X [list 0.000 2.906 -5.860 -1.651 -6.745 5.013 0.003 2.567 -6.660 -0.972 1.761 0.000]
+set targetPositionsInBlock8_Y [list 0.000 13.356 6.167 -1.219 -8.139 -14.531 -8.460 2.988 -13.310 9.967 0.604 0.000]
 
-            lappend targetPositionsInBlock [expr {int([lindex $directionList 0] * $targetDistance)} ]
-            set directionList [lreplace $directionList 0 0]
-            set listLength [llength $directionList]
-        } else {
+set targetPositionsInBlock9_X [list 0.000 -7.002 -2.671 -6.769 0.791 -3.877 6.535 -4.863 2.994 -0.914 3.923 0.000]
+set targetPositionsInBlock9_Y [list 0.000 6.495 -4.904 1.457 -6.756 13.692 6.848 -4.189 -14.964 1.292 7.872 0.000]
 
-            lappend targetPositionsInBlock [expr {int([lindex $directionList [expr {int($listLength - 1)}]] * $targetDistance)}]
-            set directionList [lreplace $directionList [expr {$listLength - 1}] [expr {$listLength - 1}]]
-            set listLength [llength $directionList]
-        }
+# Next set of 5 pairs
+set targetPositionsInBlock10_X [list 0.000 -6.118 2.584 -7.354 0.484 6.097 -7.127 5.058 -6.646 1.237 -1.892 0.000]
+set targetPositionsInBlock10_Y [list 0.000 -11.303 -2.055 -7.296 13.387 -3.219 5.143 14.145 -1.490 5.599 -11.516 0.000]
 
-        lappend targetPositionsInBlock 0 
-        set direction rand()
-    }
-    list $targetPositionsInBlock
-}
+set targetPositionsInBlock11_X [list 0.000 6.860 -6.145 6.166 1.141 -1.442 -6.150 0.171 3.385 0.440 5.381 0.000]
+set targetPositionsInBlock11_Y [list 0.000 -9.822 10.757 -8.103 9.319 14.653 -5.372 -13.182 1.697 9.899 -5.465 0.000]
 
-    # Ouputs the final vector in the form of {0, 1, 0, -1, 0, 1...}*targetDistance
-    
+set targetPositionsInBlock12_X [list 0.000 3.524 0.642 -2.833 -7.360 2.141 -7.044 -0.676 3.406 -0.952 -6.756 0.000]
+set targetPositionsInBlock12_Y [list 0.000 13.623 1.203 -12.863 12.451 -14.957 -8.746 -14.741 -4.377 -13.524 2.821 0.000]
+
+set targetPositionsInBlock13_X [list 0.000 4.785 -0.036 3.827 -0.640 5.026 1.241 5.324 -6.954 3.692 -5.341 0.000]
+set targetPositionsInBlock13_Y [list 0.000 7.157 -12.983 7.272 -10.305 12.966 2.476 -13.954 -2.768 -10.355 3.179 0.000]
+
+set targetPositionsInBlock14_X [list 0.000 4.221 -5.556 6.412 1.390 -4.987 7.490 -4.295 6.542 2.748 -0.930 0.000]
+set targetPositionsInBlock14_Y [list 0.000 7.346 -7.722 -13.461 10.152 0.066 -13.588 -3.065 -8.112 13.863 -14.825 0.000]
+
+# Final set of 5 pairs
+set targetPositionsInBlock15_X [list 0.000 -4.005 3.949 -4.148 4.949 -3.143 5.431 2.638 -3.766 4.508 -2.182 0.000]
+set targetPositionsInBlock15_Y [list 0.000 12.974 2.204 -5.129 2.536 -2.923 3.442 -8.889 -0.726 -11.848 10.233 0.000]
+
+set targetPositionsInBlock16_X [list 0.000 -5.873 1.771 6.929 2.438 -3.602 0.603 -6.615 5.851 -4.054 2.280 0.000]
+set targetPositionsInBlock16_Y [list 0.000 -13.917 2.014 7.383 0.699 13.860 -14.092 0.591 -5.094 -11.582 -6.545 0.000]
+
+set targetPositionsInBlock17_X [list 0.000 3.839 -5.791 5.229 -0.507 -6.969 -1.384 4.581 -6.717 -4.205 6.878 0.000]
+set targetPositionsInBlock17_Y [list 0.000 8.498 14.357 -13.481 -5.230 0.414 -11.759 -1.474 11.167 -1.211 8.701 0.000]
+
+set targetPositionsInBlock18_X [list 0.000 7.095 -5.686 5.962 -0.005 -7.060 4.907 1.222 -6.783 1.479 -5.790 0.000]
+set targetPositionsInBlock18_Y [list 0.000 -5.726 12.473 -5.036 3.459 -14.038 -4.800 13.130 -13.381 5.444 -12.894 0.000]
+
+set targetPositionsInBlock19_X [list 0.000 6.575 0.497 -3.484 6.415 -3.009 4.476 -3.999 5.068 -0.027 7.113 0.000]
+set targetPositionsInBlock19_Y [list 0.000 -7.337 13.643 -7.497 -12.943 2.748 8.879 3.025 12.624 -6.672 12.519 0.000]
+
+# Initialize the targets for the first block
+set targetPositionsInBlock $targetPositionsInBlock1_IE
 
 # Function that generates a random interger in a range
 proc randomInRange {range} {
     set min [lindex $range 0]
     set max [lindex $range 1]
+    puts "Random in range"
     return [expr int(rand()*($max-$min+1)) + $min]
 }
 
@@ -287,10 +309,11 @@ wm aspect . $w $h $w $h
 wm minsize . $w $h
 
 # Since it is set to 1, the window cannot be resized
+puts "max size"
 wm maxsize . [expr int($w*1)] [expr int($h*1)]
 
 # Title on the top of the window
-wm title . [concat "Variable Damping Study - " $studyType ]
+wm title . [concat "Variable Damping Study - " $targetOrientation ]
 
 # Draw a grid with a certain number of degree spacing
 drawGrid $gridSpacing
@@ -346,7 +369,7 @@ every 10 {
     global currentTarget
     global target
     global i
-    global studyType
+    global targetOrientation
     global innerCursor
     global outerCursor
     global trialsPerBlock
@@ -361,14 +384,14 @@ every 10 {
         lassign $coordinates x y
 
         # Find the correct range of the target position based on the study type
-        if {$studyType == "DP"} {
+        if {$targetOrientation == "DP"} {
             set innerCursor [ expr $y - $cursorRadius ]
             set outerCursor [ expr $y + $cursorRadius ]
-        } elseif {$studyType == "IE"} {
+        } elseif {$targetOrientation == "IE"} {
             set innerCursor [ expr $x - $cursorRadius ]
             set outerCursor [ expr $x + $cursorRadius ]
         } else {
-            puts "Error: studyType is $studyType but should be DP or IE"
+            puts "Error: targetOrientation is $targetOrientation but should be DP or IE"
         }
 
         # Called at the start of every block, including block 1
@@ -390,8 +413,9 @@ every 10 {
                 set i [expr $i + 1]
 
                 # Called when all of the trials in the block are completed
+                puts "trialsPerBlock"
                 if {$i > [expr $trialsPerBlock * 2]} {
-
+                	puts "trialsPerBlockINSIDE"
                     # Calls the end command from the controller
                     endBlock $currentBlock
 
@@ -402,7 +426,12 @@ every 10 {
 
                 # Finds the location of the next target
                 # targetPositionsInBlock is technically a nested list, so the 0 cooresponds to the list, then i to the entry within that list
-                set currentTarget [lindex $targetPositionsInBlock 0 $i]
+                #set currentTarget [lindex $targetPositionsInBlock 0 $i]
+				set currentTarget [lindex $targetPositionsInBlock $i]
+                puts $targetPositionsInBlock
+
+                puts "CurrentTarget:"
+                puts $currentTarget
 
                 # What happens after a target at a distance is met and new neutral target just appeared
                 if {$currentTarget == 0} {
@@ -439,9 +468,9 @@ every 10 {
                     exec bash /home/imt/imt/robot4/protocols/ankle/VariableDampingStudy/Supporting/playSound.sh &
 
                     # Show text that says "Go!" next to or above the target, depending on whether the trial is DP or IE
-      				if {$studyType == "DP"} {
+      				if {$targetOrientation == "DP"} {
                     	.right.view create text [transformX 5 ] [transformY $currentTarget ] -text "Go!" -font [list Helvetica 50] -tags goText
-                	} elseif {$studyType == "IE"} {
+                	} elseif {$targetOrientation == "IE"} {
                     	.right.view create text [transformX $currentTarget ] [transformY 5 ] -text "Go!" -font [list Helvetica 50] -tags goText
                		 }
                 }
@@ -450,9 +479,9 @@ every 10 {
                 .right.view coords $::target [drawCircle $currentTarget 0 $targetRadius ]
 
         		# Places the target on the correct coordinate axis for DP vs IE studies
-                if {$studyType == "DP"} {
+                if {$targetOrientation == "DP"} {
                     .right.view coords $::target [drawCircle 0 $currentTarget $targetRadius ]
-                } elseif {$studyType == "IE"} {
+                } elseif {$targetOrientation == "IE"} {
                     .right.view coords $::target [drawCircle $currentTarget 0 $targetRadius ]
                 }
             }
