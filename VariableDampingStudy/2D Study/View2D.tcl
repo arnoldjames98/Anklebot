@@ -347,7 +347,9 @@ set i 0
 set currentTarget 0
 set currentTarget_X 0
 set currentTarget_Y 0
-set currentBlock 1
+#set currentBlock 1
+# Added for faster testing YOYOYOYO
+set currentBlock 4
 set currentTrial 0
 # The first target is always in the neutral position, so make it based on the random range
 set requiredTimeInsideTarget [randomInRange $neutralTimeRange]
@@ -424,7 +426,8 @@ if {[ expr $currentTarget_X - $targetRadius ] <= $innerCursor_IE && [ expr $curr
     set i [expr $i + 1]
     
     # Called when all of the trials in the block are completed, not *2 like for 1D because no return to netural
-    if {$i > [expr $trialsPerBlock]} {
+    # Plus 1 to account for end block
+    if {$i > [expr $trialsPerBlock + 1]} {
       # Calls the end command from the controller
       endBlock $currentBlock
       
@@ -446,13 +449,16 @@ if {[ expr $currentTarget_X - $targetRadius ] <= $innerCursor_IE && [ expr $curr
       
       # Neutral target, random time range to be met (How long is needed to stay inside the target to meet the target)
       set requiredTimeInsideTarget [randomInRange $neutralTimeRange]
-      
+
       # When i = 0, trial number is output twice: before and after the block
       # Therefore, only dispaly when i > 0
-      if {$i > 0} {
+      if {$i > 1} {
         # Display the trial number, which was updated when the target at a distance was met
         #puts "Trial $currentTrial of $totalTrials complete"
+        # Called before the return to neutral after the very last trial
+        set currentTrial [expr $currentTrial + 1]
         endTrial $currentTrial
+        puts "Top ONE!"
         
         # Delete text that says "Go!"
         .right.view delete goText
@@ -463,13 +469,31 @@ if {[ expr $currentTarget_X - $targetRadius ] <= $innerCursor_IE && [ expr $curr
       set requiredTimeInsideTarget $targetTime
       
       # Where the trial number is being updated, but it is displayed in the if clause of this statement
-      set currentTrial [expr $currentTrial + 1]
+      puts "Called!"
+      puts $i
+      if {$i > 1} {
+      		set currentTrial [expr $currentTrial + 1]
+  		}
       
       # Sends a signal to the controller that shows the distance of the target (just send a 1 for 2D)
       sendTargetDistanceSignal 1
       
       # Play an audio file at the start of each trial, using a bash script
       exec bash /home/imt/imt/robot4/protocols/ankle/VariableDampingStudy/Supporting/playSound.sh &
+
+
+      # Counts the trials, and deletes the previous Go! text
+		if {$i > 1} {
+        	# Display the trial number, which was updated when the target at a distance was met
+        	#puts "Trial $currentTrial of $totalTrials complete"
+        	endTrial $currentTrial
+        	puts "Bottom ONE!"
+        
+        	# Delete text that says "Go!"
+        	.right.view delete goText
+      	}
+
+
       
       # Show text that says "Go!" next to or above the target, depending on whether the trial is DP or IE
       if {$targetOrientation == "DP"} {
@@ -478,7 +502,7 @@ if {[ expr $currentTarget_X - $targetRadius ] <= $innerCursor_IE && [ expr $curr
         .right.view create text [transformX $currentTarget ] [transformY 5 ] -text "Go!" -font [list Helvetica 50] -tags goText
       } elseif {$targetOrientation == "2D"} {
         # Same as for DP
-        .right.view create text [transformX 5 ] [transformY $currentTarget ] -text "Go!" -font [list Helvetica 50] -tags goText
+        .right.view create text [transformX [expr $currentTarget_X + 5] ] [transformY $currentTarget_Y ] -text "Go!" -font [list Helvetica 50] -tags goText
       }
     }
     
@@ -568,6 +592,8 @@ if {[ expr $currentTarget_X - $targetRadius ] <= $innerCursor_IE && [ expr $curr
                     endBlock $currentBlock
 
                     set currentBlock [expr $currentBlock + 1]
+
+
                     # Reset the index to 0
                     set i 0
                 }

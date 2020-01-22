@@ -13,7 +13,9 @@ bind . <Key-q> done
 set targetOrientation "IE"
 
 # Damping environments and the number of blocks for each (place in order)
-set dampingEnvironments [list {zero 1} {tuning 1} {zero 1} {tuning 1} {positive 5} {negative 5} {variable 5}]
+#set dampingEnvironments [list {zero 1} {tuning 1} {zero 1} {tuning 1} {positive 5} {negative 5} {variable 5}]
+# ADDED for FASTER TESTING YOYOYOY
+set dampingEnvironments [list {zero 1} {positive 5} {negative 5} {variable 5}]
 # Number of trials in a block, should be even in order to ensure equal number of trials in both directions
 set trialsPerBlock 10
 # Damping values
