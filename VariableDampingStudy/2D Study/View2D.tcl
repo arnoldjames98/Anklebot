@@ -347,9 +347,9 @@ set i 0
 set currentTarget 0
 set currentTarget_X 0
 set currentTarget_Y 0
-#set currentBlock 1
+set currentBlock 1
 # Added for faster testing YOYOYOYO
-set currentBlock 4
+#set currentBlock 4
 set currentTrial 0
 # The first target is always in the neutral position, so make it based on the random range
 set requiredTimeInsideTarget [randomInRange $neutralTimeRange]
