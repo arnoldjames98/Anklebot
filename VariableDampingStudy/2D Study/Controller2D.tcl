@@ -17,9 +17,12 @@ set dampingEnvironments [list {zero 1} {tuning 1} {zero 1} {tuning 1} {positive 
 # Number of trials in a block, should be even in order to ensure equal number of trials in both directions
 set trialsPerBlock 10
 # Damping values
-set negativeDamping -0.5
-set positiveDamping 1
-set variableDampingRange [list $negativeDamping $positiveDamping]
+set negativeDamping_IE -0.5
+set positiveDamping_IE 1
+set variableDampingRange_IE [list $negativeDamping_IE $positiveDamping_IE]
+set negativeDamping_DP -1
+set positiveDamping_DP 2
+set variableDampingRange_DP [list $negativeDamping_DP $positiveDamping_DP]
 
 # Initialized list of every damping enviorment in order
 set everyBlockEnvironment {}
@@ -279,8 +282,13 @@ proc endBlock {currentBlock} {
   global enablingVariableDamping
   global kMatrixPos
   global kMatrixNeg
+
   global selectedK_pos
   global selectedK_neg
+  global selectedK_pos_IE
+  global selectedK_neg_IE
+  global selectedK_pos_DP
+  global selectedK_neg_DP
 
   global targetPositionsInBlock
   global targetPositionsInBlock_X
@@ -299,10 +307,10 @@ proc endBlock {currentBlock} {
     proc lavg L {expr ([join $L +])/[llength $L].}
     set selectedK_pos [lavg $kMatrixPos]
     set selectedK_neg [lavg $kMatrixNeg]
-    puts "Here is the selected K from the previous block, for positive intent:"
-    puts $selectedK_pos
-    puts "Here is the selected K from the previous block, for negative intent:"
-    puts $selectedK_neg
+    #puts "Here is the selected K from the previous block, for positive intent:"
+    #puts $selectedK_pos
+    #puts "Here is the selected K from the previous block, for negative intent:"
+    #puts $selectedK_neg
     #Reset kMatrix for next average
     set kMatrixPos { }
 	set kMatrixNeg { }
@@ -341,12 +349,21 @@ proc endBlock {currentBlock} {
     #Specifications for each block after 1
     # Block 2
     if {[expr $currentBlock + 1] == 2} {
+      # Not needed
       set targetOrientation "IE"
       set targetPositionsInBlock $targetPositionsInBlock2_IE
       puts "IE NEW TARGET LOCATIONS"
     }
     # Block 3
     if {[expr $currentBlock + 1] == 3} {
+      # Save the selected K values before switching to the DP direction
+      set selectedK_pos_IE $selectedK_pos
+      set selectedK_neg_IE $selectedK_neg
+      puts "Here is the selected K from the previous block, for positive intent, IE direction:"
+      puts $selectedK_pos_IE
+      puts "Here is the selected K from the previous block, for negative intent, IE direction:"
+      puts $selectedK_neg_IE
+
       set targetOrientation "DP"
       set targetPositionsInBlock $targetPositionsInBlock3_DP
       puts "DP NEW TARGET LOCATIONS"
@@ -359,6 +376,13 @@ proc endBlock {currentBlock} {
     }
     # Block 5
     if {[expr $currentBlock + 1] == 5} {
+      # Save the selected K values before switching to the 2D direction
+      set selectedK_pos_DP $selectedK_pos
+      set selectedK_neg_DP $selectedK_neg
+      puts "Here is the selected K from the previous block, for positive intent, DP direction:"
+      puts $selectedK_pos_DP
+      puts "Here is the selected K from the previous block, for negative intent, DP direction:"
+      puts $selectedK_neg_DP
       # TODO: MAKE ALL OF THESE VARIABLES WORK AND HAVE MEANING
       set targetOrientation "2D"
       set targetPositionsInBlock_X targetPositionsInBlock5_X
@@ -395,6 +419,10 @@ proc endTrial {currentTrial} {
   global va_max
   global va_min
   global variableDampingRange
+  global variableDampingRange_IE
+  global variableDampingRange_DP
+  global targetOrientation
+
 
   # Find the current damping enviornment
   set currentDampingEnvironment [lindex $everyBlockEnvironment [expr $currentBlock - 1]]
@@ -417,6 +445,14 @@ proc endTrial {currentTrial} {
     set va_max $maxVal
     set va_min $minVal
 
+    # Need to assign the appropriate variable damping range based on the target orientation
+    # Not needed in previous studies because there was only one range
+    if {$targetOrientation == "IE"} {
+      set variableDampingRange $variableDampingRange_IE
+    } elseif {$targetOrientation == "DP"} {
+      set variableDampingRange $variableDampingRange_DP
+    }
+
     set b_UB [lindex $variableDampingRange 1]
     set b_LB [lindex $variableDampingRange 0]
 
@@ -438,6 +474,10 @@ proc setDampingEnvironment {currentBlock} {
 	global everyBlockEnvironment
   global positiveDamping
   global negativeDamping
+  global positiveDamping_IE
+  global positiveDamping_DP
+  global negativeDamping_IE
+  global negativeDamping_DP
   global calculatingK
   global enablingVariableDamping
 
@@ -449,7 +489,8 @@ proc setDampingEnvironment {currentBlock} {
 
   # Apply the appropriate damping based on the current damping environment
   if {$currentDampingEnvironment == "zero"} {
-    applyDamping 0.2
+    # Apply zero damping
+    applyDamping 0 0
     set calculatingK 1
 
   } elseif {$currentDampingEnvironment == "tuning"} {
@@ -460,10 +501,10 @@ proc setDampingEnvironment {currentBlock} {
     set enablingVariableDamping 1
 
   } elseif {$currentDampingEnvironment == "negative"} {
-    applyDamping $negativeDamping
+    applyDamping $negativeDamping_IE $negativeDamping_DP
 
   } elseif {$currentDampingEnvironment == "positive"} {
-    applyDamping $positiveDamping
+    applyDamping $positiveDamping_IE $positiveDamping_DP
 
   } else {
     puts "Error: $currentDampingEnvironment is not a known damping environment."
@@ -471,19 +512,40 @@ proc setDampingEnvironment {currentBlock} {
 
 }
 
-proc applyDamping {damping} {
+#proc applyDamping {damping} {
+#  global targetOrientation
+#  #puts "Damping of $damping Nms/rad"
+#  if {$targetOrientation == "DP"} {
+#    # Apply the input constant damping
+#    wshm ankle_damp_DP $damping
+#    # Apply positive daming to the direction opposite of movement
+#    wshm ankle_damp_IE 1.0
+#  } elseif {$targetOrientation == "IE"} {
+#    # Apply positive daming to the direction opposite of movement
+#    wshm ankle_damp_DP 1.0
+#    # Apply the input constant damping
+#    wshm ankle_damp_IE $damping
+#  }
+#}
+
+proc applyDamping {damping_IE damping_DP} {
   global targetOrientation
   #puts "Damping of $damping Nms/rad"
   if {$targetOrientation == "DP"} {
     # Apply the input constant damping
-    wshm ankle_damp_DP $damping
+    wshm ankle_damp_DP $damping_DP
     # Apply positive daming to the direction opposite of movement
     wshm ankle_damp_IE 1.0
+
   } elseif {$targetOrientation == "IE"} {
     # Apply positive daming to the direction opposite of movement
     wshm ankle_damp_DP 1.0
     # Apply the input constant damping
-    wshm ankle_damp_IE $damping
+    wshm ankle_damp_IE $damping_IE
+
+  } elseif {$targetOrientation == "2D"} {
+    wshm ankle_damp_DP $damping_DP
+    wshm ankle_damp_IE $damping_IE
   }
 }
 
@@ -534,6 +596,8 @@ every 10 {
   global calculatingK
   global enablingVariableDamping
   global variableDampingRange
+  global variableDampingRange_IE
+  global variableDampingRange_DP
   global targetOrientation
   global xtime
   global graphMatrix
@@ -615,9 +679,18 @@ every 10 {
     }
   }
 
-  # Runs during blocks when it is desired that variable damping be applied
+  # Runs during blocks when it is desired that variable damping be applied for just 1D (either DP or IE)
   if {$enablingVariableDamping == 1} {
     #puts "Variable damping is being applied"
+
+    # Need to assign the appropriate variable damping range based on the target orientation
+    # Not needed in previous studies because there was only one range
+    if {$targetOrientation == "IE"} {
+      set variableDampingRange $variableDampingRange_IE
+    } elseif {$targetOrientation == "DP"} {
+      set variableDampingRange $variableDampingRange_DP
+    }
+
     # Find the damping range
     set b_UB [lindex $variableDampingRange 1]
     set b_LB [lindex $variableDampingRange 0]
@@ -634,14 +707,16 @@ every 10 {
     	# Send the selected variable damping k to the log
     	wshm ankle_varDamp_K $selectedK_pos
     	set damping [ expr { ( 2 * $b_LB ) / (1 + exp( (-1) * $selectedK_pos * $vel * $accel) ) - $b_LB } ]
-    	applyDamping $damping
+    	# Only the appropriate damping will be set (look at function, the other direction will be set to 1)
+      applyDamping $damping $damping
 
     # Damping for negative intent
     } else {
     	# Send the selected variable damping k to the log
     	wshm ankle_varDamp_K $selectedK_neg
     	set damping [ expr { (-1) * ( ( 2 * $b_UB ) / (1 + exp( (-1) * $selectedK_neg * $vel * $accel) ) - $b_UB ) } ]
-    	applyDamping $damping
+    	# Only the appropriate damping will be set (look at function, the other direction will be set to 1)
+      applyDamping $damping $damping
     }
   }
 }

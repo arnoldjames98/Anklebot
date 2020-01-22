@@ -90,7 +90,6 @@ proc drawGradient {win axis col1Str col2Str} {
     set bRatio [expr $bRange / $max]
 
     for {set i 0} {$i < $max} {incr i} {
-    	puts "drawGradient"
         set nR [expr int( $r1 + ($rRatio * $i) )]
         set nG [expr int( $g1 + ($gRatio * $i) )]
         set nB [expr int( $b1 + ($bRatio * $i) )]
@@ -275,7 +274,6 @@ set targetPositionsInBlock $targetPositionsInBlock1_IE
 proc randomInRange {range} {
     set min [lindex $range 0]
     set max [lindex $range 1]
-    puts "Random in range"
     return [expr int(rand()*($max-$min+1)) + $min]
 }
 
@@ -309,11 +307,10 @@ wm aspect . $w $h $w $h
 wm minsize . $w $h
 
 # Since it is set to 1, the window cannot be resized
-puts "max size"
 wm maxsize . [expr int($w*1)] [expr int($h*1)]
 
 # Title on the top of the window
-wm title . [concat "Variable Damping Study - " $targetOrientation ]
+wm title . [concat "Variable Damping Study - 2D" ]
 
 # Draw a grid with a certain number of degree spacing
 drawGrid $gridSpacing
@@ -413,9 +410,7 @@ every 10 {
                 set i [expr $i + 1]
 
                 # Called when all of the trials in the block are completed
-                puts "trialsPerBlock"
                 if {$i > [expr $trialsPerBlock * 2]} {
-                	puts "trialsPerBlockINSIDE"
                     # Calls the end command from the controller
                     endBlock $currentBlock
 
@@ -428,10 +423,9 @@ every 10 {
                 # targetPositionsInBlock is technically a nested list, so the 0 cooresponds to the list, then i to the entry within that list
                 #set currentTarget [lindex $targetPositionsInBlock 0 $i]
 				set currentTarget [lindex $targetPositionsInBlock $i]
-                puts $targetPositionsInBlock
-
-                puts "CurrentTarget:"
-                puts $currentTarget
+                #puts $targetPositionsInBlock
+                #puts "CurrentTarget:"
+                #puts $currentTarget
 
                 # What happens after a target at a distance is met and new neutral target just appeared
                 if {$currentTarget == 0} {
