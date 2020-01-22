@@ -299,6 +299,34 @@ proc endBlock {currentBlock} {
   global targetPositionsInBlock4_DP
   global targetPositionsInBlock5_X
   global targetPositionsInBlock5_Y
+  global targetPositionsInBlock6_X
+  global targetPositionsInBlock6_Y
+  global targetPositionsInBlock7_X
+  global targetPositionsInBlock7_Y
+  global targetPositionsInBlock8_X
+  global targetPositionsInBlock8_Y
+  global targetPositionsInBlock9_X
+  global targetPositionsInBlock9_Y
+  global targetPositionsInBlock10_X
+  global targetPositionsInBlock10_Y
+  global targetPositionsInBlock11_X
+  global targetPositionsInBlock11_Y
+  global targetPositionsInBlock12_X
+  global targetPositionsInBlock12_Y
+  global targetPositionsInBlock13_X
+  global targetPositionsInBlock13_Y
+  global targetPositionsInBlock14_X
+  global targetPositionsInBlock14_Y
+  global targetPositionsInBlock15_X
+  global targetPositionsInBlock15_Y
+  global targetPositionsInBlock16_X
+  global targetPositionsInBlock16_Y
+  global targetPositionsInBlock17_X
+  global targetPositionsInBlock17_Y
+  global targetPositionsInBlock18_X
+  global targetPositionsInBlock18_Y
+  global targetPositionsInBlock19_X
+  global targetPositionsInBlock19_Y
 
 	puts "End of block $currentBlock"
 
@@ -385,10 +413,17 @@ proc endBlock {currentBlock} {
       puts $selectedK_neg_DP
       # TODO: MAKE ALL OF THESE VARIABLES WORK AND HAVE MEANING
       set targetOrientation "2D"
-      set targetPositionsInBlock_X targetPositionsInBlock5_X
-      set targetPositionsInBlock_Y targetPositionsInBlock5_Y
+      set targetPositionsInBlock_X $targetPositionsInBlock5_X
+      set targetPositionsInBlock_Y $targetPositionsInBlock5_Y
       puts "2D NEW TARGET LOCATIONS"
     }	
+    # Block 6
+    if {[expr $currentBlock + 1] == 6} {
+      set targetOrientation "2D"
+      set targetPositionsInBlock_X $targetPositionsInBlock6_X
+      set targetPositionsInBlock_Y $targetPositionsInBlock6_Y
+      puts "2D NEW TARGET LOCATIONS"
+    }
 
     # Remove the appropriate stiffness to continue the trials
     applyStiffness
@@ -512,22 +547,9 @@ proc setDampingEnvironment {currentBlock} {
 
 }
 
-#proc applyDamping {damping} {
-#  global targetOrientation
-#  #puts "Damping of $damping Nms/rad"
-#  if {$targetOrientation == "DP"} {
-#    # Apply the input constant damping
-#    wshm ankle_damp_DP $damping
-#    # Apply positive daming to the direction opposite of movement
-#    wshm ankle_damp_IE 1.0
-#  } elseif {$targetOrientation == "IE"} {
-#    # Apply positive daming to the direction opposite of movement
-#    wshm ankle_damp_DP 1.0
-#    # Apply the input constant damping
-#    wshm ankle_damp_IE $damping
-#  }
-#}
-
+# Unlike in the previous studies, this function takes two inputs for the different ankle directions
+# If only applying for 1 direction (ie. tuning DP constant) you can send the same value for IE and DP 
+# and the function will automattically limit the damping to the correct direction
 proc applyDamping {damping_IE damping_DP} {
   global targetOrientation
   #puts "Damping of $damping Nms/rad"
