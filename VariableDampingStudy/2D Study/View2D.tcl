@@ -390,6 +390,10 @@ every 10 {
 
     if {$studyStarted == 1} {
 
+######################################################################################
+# CODE BELOW ONLY USED FOR BLOCKS THAT ARE 2D (old code for 1D included in else clause)
+######################################################################################
+
     	if {$targetOrientation == "2D"} {
     		# TODO: New code for target reaching in 2D
 
@@ -408,10 +412,6 @@ every 10 {
         if {$i == 0 } {
     		set requiredTimeInsideTarget 5000
         }
-
-
-
-
 
         # What happens when the subject/cursor is inside of the target
 if {[ expr $currentTarget_X - $targetRadius ] <= $innerCursor_IE && [ expr $currentTarget_X + $targetRadius ] >= $outerCursor_IE && [ expr $currentTarget_Y - $targetRadius ] <= $innerCursor_DP && [ expr $currentTarget_Y + $targetRadius ] >= $outerCursor_DP } {
@@ -458,7 +458,7 @@ if {[ expr $currentTarget_X - $targetRadius ] <= $innerCursor_IE && [ expr $curr
         # Called before the return to neutral after the very last trial
         set currentTrial [expr $currentTrial + 1]
         endTrial $currentTrial
-        puts "Top ONE!"
+        #puts "Top ONE!"
         
         # Delete text that says "Go!"
         .right.view delete goText
@@ -469,8 +469,7 @@ if {[ expr $currentTarget_X - $targetRadius ] <= $innerCursor_IE && [ expr $curr
       set requiredTimeInsideTarget $targetTime
       
       # Where the trial number is being updated, but it is displayed in the if clause of this statement
-      puts "Called!"
-      puts $i
+      #puts $i
       if {$i > 1} {
       		set currentTrial [expr $currentTrial + 1]
   		}
@@ -487,13 +486,11 @@ if {[ expr $currentTarget_X - $targetRadius ] <= $innerCursor_IE && [ expr $curr
         	# Display the trial number, which was updated when the target at a distance was met
         	#puts "Trial $currentTrial of $totalTrials complete"
         	endTrial $currentTrial
-        	puts "Bottom ONE!"
+        	#puts "Bottom ONE!"
         
         	# Delete text that says "Go!"
         	.right.view delete goText
       	}
-
-
       
       # Show text that says "Go!" next to or above the target, depending on whether the trial is DP or IE
       if {$targetOrientation == "DP"} {
@@ -528,25 +525,9 @@ if {[ expr $currentTarget_X - $targetRadius ] <= $innerCursor_IE && [ expr $curr
   set timeInsideTarget 0
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+###################################################################################
+# CODE ABOVE ONLY USED FOR BLOCKS THAT ARE 2D (old code for 1D included below)
+###################################################################################
 
 
     	# Moved all of the code from the previous study so that 1D blocks still function the same
@@ -601,6 +582,7 @@ if {[ expr $currentTarget_X - $targetRadius ] <= $innerCursor_IE && [ expr $curr
                 # Finds the location of the next target
                 # targetPositionsInBlock is technically a nested list, so the 0 cooresponds to the list, then i to the entry within that list
                 #set currentTarget [lindex $targetPositionsInBlock 0 $i]
+                # By predetermining the target positions, this is no longer a nested list, so the zero is not needed as in previous studies
 				set currentTarget [lindex $targetPositionsInBlock $i]
                 #puts $targetPositionsInBlock
                 #puts "CurrentTarget:"

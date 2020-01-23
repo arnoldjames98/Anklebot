@@ -525,8 +525,8 @@ proc endBlock {currentBlock} {
 
     # Apply the appropriate damping based on the current block
     setDampingEnvironment [expr $currentBlock + 1]
-    puts "Here is the current block:"
-    puts [expr $currentBlock + 1]
+    #puts "Here is the current block:"
+    #puts [expr $currentBlock + 1]
 
     logSetup $subjectName [join [list "_" [lindex $everyBlockEnvironment $currentBlock]]]
 		start_log $ob(logf) $ob(nlog)
@@ -563,7 +563,7 @@ proc endTrial {currentTrial} {
     
   # Determine whether or not k needs to be calculated
   if {$calculatingK == 1} {
-    puts "Calculating K from the previous trial"
+    #puts "Calculating K from the previous trial"
     # Graph the extrema values as red points on the graph
     foo data d1 -colour red -points 1 -lines 0 -coords $maxMinPoints
     # Graph the velocity times acceleration data as a line on the graph
