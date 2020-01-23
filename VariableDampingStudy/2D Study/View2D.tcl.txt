@@ -1,4 +1,4 @@
-## View2D.tcl
+## View.tcl
 # Created by James Arnold
 
 package require Tk
@@ -326,8 +326,7 @@ set center [.right.view create oval [drawCircle 0 0 0.1 ] -fill $gridColor -outl
 
 # Load the file that allows for the creation of a graph in tcl (used for calculation of k)
 source /home/imt/imt/robot4/protocols/ankle/VariableDampingStudy/Supporting/Graph.tcl
-#emu_graph::emu_graph foo -canvas .right.view -width 600 -height 300 -xref 200 -yref 600
-emu_graph::emu_graph responseGraph -canvas .right.view -width 600 -height 300 -xref 200 -yref 600
+emu_graph::emu_graph foo -canvas .right.view -width 600 -height 300 -xref 200 -yref 600
 
 
 # ----------------------Loops----------------------

@@ -1,4 +1,4 @@
-## Controller2D.tcl
+## Controller.tcl
 # Created by James Arnold
 
 package require Tk
@@ -565,11 +565,9 @@ proc endTrial {currentTrial} {
   if {$calculatingK == 1} {
     #puts "Calculating K from the previous trial"
     # Graph the extrema values as red points on the graph
-    #foo data d1 -colour red -points 1 -lines 0 -coords $maxMinPoints
-    responseGraph data d1 -colour red -points 1 -lines 0 -coords $maxMinPoints
+    foo data d1 -colour red -points 1 -lines 0 -coords $maxMinPoints
     # Graph the velocity times acceleration data as a line on the graph
-    #foo data d2 -colour blue -points 0 -lines 1 -coords $graphMatrix
-    responseGraph data d2 -colour blue -points 0 -lines 1 -coords $graphMatrix
+    foo data d2 -colour blue -points 0 -lines 1 -coords $graphMatrix
     
     # Finds the parameters for finding k
     set r 0.95
@@ -599,9 +597,6 @@ proc endTrial {currentTrial} {
     #puts $kMatrixPos
     #puts "Here is the new k matrix for negative intent:"
     #puts $kMatrixNeg
-  } else {
-    # Delete the response graph once K is not being calculated
-    responseGraph destroy
   }
 }
 
@@ -861,7 +856,7 @@ every 10 {
   
   # Runs during blocks when it is desired that variable damping be applied for 2D (both DP and IE)
   if {$enablingVariableDamping == 2} {
-    #puts "2D Variable damping is being applied"
+    puts "2D Variable damping is being applied"
     
     # Find the damping range
     set b_UB_IE [lindex $variableDampingRange_IE 1]
@@ -898,4 +893,7 @@ every 10 {
     # Now that the correct IE, DP, +, and - damping has been found for this time step, set the damping
     applyDamping $damping_IE $damping_DP
   }
+  
+  
+  
 }
