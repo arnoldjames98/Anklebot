@@ -13,10 +13,7 @@ bind . <Key-q> done
 set targetOrientation "IE"
 
 # Damping environments and the number of blocks for each (place in order)
-#set dampingEnvironments [list {zero 1} {tuning 1} {zero 1} {tuning 1} {positive 5} {negative 5} {variable 5}]
-set dampingEnvironments [list {zero 1} {tuning 1} {zero 1} {tuning 1} {variable 5} {negative 5} {positive 5}]
-# ADDED for FASTER TESTING YOYOYOY
-#set dampingEnvironments [list {zero 1} {positive 5} {negative 5} {variable 5}]
+set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_negative 1} {practice_variable 1} {positive 5} {negative 5} {variable 5}]
 
 # Number of trials in a block, should be even in order to ensure equal number of trials in both directions
 set trialsPerBlock 10
@@ -299,12 +296,10 @@ proc endBlock {currentBlock} {
   global targetPositionsInBlock_Y
   
   global targetPositionsInBlock2_IE
-  global targetPositionsInBlock3_DP
+  global targetPositionsInBlock3_IE
   global targetPositionsInBlock4_DP
-  global targetPositionsInBlock5_X
-  global targetPositionsInBlock5_Y
-  global targetPositionsInBlock6_X
-  global targetPositionsInBlock6_Y
+  global targetPositionsInBlock5_DP
+  global targetPositionsInBlock6_DP
   global targetPositionsInBlock7_X
   global targetPositionsInBlock7_Y
   global targetPositionsInBlock8_X
@@ -331,6 +326,16 @@ proc endBlock {currentBlock} {
   global targetPositionsInBlock18_Y
   global targetPositionsInBlock19_X
   global targetPositionsInBlock19_Y
+  global targetPositionsInBlock20_X
+  global targetPositionsInBlock20_Y
+  global targetPositionsInBlock21_X
+  global targetPositionsInBlock21_Y
+  global targetPositionsInBlock22_X
+  global targetPositionsInBlock22_Y
+  global targetPositionsInBlock23_X
+  global targetPositionsInBlock23_Y
+  global targetPositionsInBlock24_X
+  global targetPositionsInBlock24_Y
   
   puts "End of block $currentBlock"
   
@@ -376,8 +381,7 @@ proc endBlock {currentBlock} {
     puts "Press ENTER to continue"
     gets stdin in
     
-    
-    
+    ############################# IE TUNING #############################
     #Specifications for each block after 1
     # Block 2
     if {[expr $currentBlock + 1] == 2} {
@@ -388,6 +392,15 @@ proc endBlock {currentBlock} {
     }
     # Block 3
     if {[expr $currentBlock + 1] == 3} {
+      # Not needed
+      set targetOrientation "IE"
+      set targetPositionsInBlock $targetPositionsInBlock3_IE
+      puts "IE NEW TARGET LOCATIONS 3"
+    }
+
+    ############################# DP TUNING #############################
+    # Block 4
+    if {[expr $currentBlock + 1] == 4} {
       # Save the selected K values before switching to the DP direction
       set selectedK_pos_IE $selectedK_pos
       set selectedK_neg_IE $selectedK_neg
@@ -397,17 +410,25 @@ proc endBlock {currentBlock} {
       puts $selectedK_neg_IE
       
       set targetOrientation "DP"
-      set targetPositionsInBlock $targetPositionsInBlock3_DP
-      puts "DP NEW TARGET LOCATIONS 3"
-    }
-    # Block 4
-    if {[expr $currentBlock + 1] == 4} {
-      set targetOrientation "DP"
       set targetPositionsInBlock $targetPositionsInBlock4_DP
       puts "DP NEW TARGET LOCATIONS 4"
     }
     # Block 5
     if {[expr $currentBlock + 1] == 5} {
+      set targetOrientation "DP"
+      set targetPositionsInBlock $targetPositionsInBlock5_DP
+      puts "DP NEW TARGET LOCATIONS 5"
+    }
+    # Block 6
+    if {[expr $currentBlock + 1] == 6} {
+      set targetOrientation "DP"
+      set targetPositionsInBlock $targetPositionsInBlock6_DP
+      puts "DP NEW TARGET LOCATIONS 6"
+    }
+
+    ############################# PRACTICE BLOCKS #############################
+    # Block 7
+    if {[expr $currentBlock + 1] == 7} {
       # Save the selected K values before switching to the 2D direction
       set selectedK_pos_DP $selectedK_pos
       set selectedK_neg_DP $selectedK_neg
@@ -415,40 +436,28 @@ proc endBlock {currentBlock} {
       puts $selectedK_pos_DP
       puts "Here is the selected K from the previous block, for negative intent, DP direction:"
       puts $selectedK_neg_DP
-      # TODO: MAKE ALL OF THESE VARIABLES WORK AND HAVE MEANING
-      set targetOrientation "2D"
-      set targetPositionsInBlock_X $targetPositionsInBlock5_X
-      set targetPositionsInBlock_Y $targetPositionsInBlock5_Y
-      puts "2D NEW TARGET LOCATIONS 5"
-    }
-    # Block 6
-    if {[expr $currentBlock + 1] == 6} {
-      set targetOrientation "2D"
-      set targetPositionsInBlock_X $targetPositionsInBlock6_X
-      set targetPositionsInBlock_Y $targetPositionsInBlock6_Y
-      puts "2D NEW TARGET LOCATIONS 6"
-    }
-    # Block 7
-    if {[expr $currentBlock + 1] == 7} {
+
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock7_X
       set targetPositionsInBlock_Y $targetPositionsInBlock7_Y
-      puts "2D NEW TARGET LOCATIONS 7"
+      puts "2D NEW TARGET LOCATIONS 7 (PRACTICE)"
     }
     # Block 8
     if {[expr $currentBlock + 1] == 8} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock8_X
       set targetPositionsInBlock_Y $targetPositionsInBlock8_Y
-      puts "2D NEW TARGET LOCATIONS 8"
+      puts "2D NEW TARGET LOCATIONS 8 (PRACTICE)"
     }
     # Block 9
     if {[expr $currentBlock + 1] == 9} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock9_X
       set targetPositionsInBlock_Y $targetPositionsInBlock9_Y
-      puts "2D NEW TARGET LOCATIONS 9"
+      puts "2D NEW TARGET LOCATIONS 9 (PRACTICE)"
     }
+
+    ############################# DATA COLLECTION BLOCKS #############################
     # Block 10
     if {[expr $currentBlock + 1] == 10} {
       set targetOrientation "2D"
@@ -518,6 +527,41 @@ proc endBlock {currentBlock} {
       set targetPositionsInBlock_X $targetPositionsInBlock19_X
       set targetPositionsInBlock_Y $targetPositionsInBlock19_Y
       puts "2D NEW TARGET LOCATIONS 19"
+    }
+    # Block 20
+    if {[expr $currentBlock + 1] == 20} {
+      set targetOrientation "2D"
+      set targetPositionsInBlock_X $targetPositionsInBlock20_X
+      set targetPositionsInBlock_Y $targetPositionsInBlock20_Y
+      puts "2D NEW TARGET LOCATIONS 20"
+    }
+    # Block 21
+    if {[expr $currentBlock + 1] == 21} {
+      set targetOrientation "2D"
+      set targetPositionsInBlock_X $targetPositionsInBlock21_X
+      set targetPositionsInBlock_Y $targetPositionsInBlock21_Y
+      puts "2D NEW TARGET LOCATIONS 21"
+    }
+    # Block 22
+    if {[expr $currentBlock + 1] == 22} {
+      set targetOrientation "2D"
+      set targetPositionsInBlock_X $targetPositionsInBlock22_X
+      set targetPositionsInBlock_Y $targetPositionsInBlock22_Y
+      puts "2D NEW TARGET LOCATIONS 22"
+    }
+    # Block 23
+    if {[expr $currentBlock + 1] == 23} {
+      set targetOrientation "2D"
+      set targetPositionsInBlock_X $targetPositionsInBlock23_X
+      set targetPositionsInBlock_Y $targetPositionsInBlock23_Y
+      puts "2D NEW TARGET LOCATIONS 23"
+    }
+    # Block 24
+    if {[expr $currentBlock + 1] == 24} {
+      set targetOrientation "2D"
+      set targetPositionsInBlock_X $targetPositionsInBlock24_X
+      set targetPositionsInBlock_Y $targetPositionsInBlock24_Y
+      puts "2D NEW TARGET LOCATIONS 24"
     }
     
     # Remove the appropriate stiffness to continue the trials
@@ -623,24 +667,24 @@ proc setDampingEnvironment {currentBlock} {
   puts "Damping environment: $currentDampingEnvironment damping"
   
   # Apply the appropriate damping based on the current damping environment
-  if {$currentDampingEnvironment == "zero"} {
+  if {$currentDampingEnvironment == "zero" || $currentDampingEnvironment == "zero_IE" || $currentDampingEnvironment == "zero_DP" } {
     # Apply zero damping
     applyDamping 0 0
     set calculatingK 1
     
-  } elseif {$currentDampingEnvironment == "tuning"} {
+  } elseif {$currentDampingEnvironment == "tuning" || $currentDampingEnvironment == "tuning_IE" || $currentDampingEnvironment == "tuning_DP" } {
     set calculatingK 1
     # Tuning uses 1D variable damping
     set enablingVariableDamping 1
     
-  } elseif {$currentDampingEnvironment == "variable"} {
+  } elseif {$currentDampingEnvironment == "variable" || $currentDampingEnvironment == "practice_variable" } {
     # Variable damping trials use 2D variable damping
     set enablingVariableDamping 2
     
-  } elseif {$currentDampingEnvironment == "negative"} {
+  } elseif {$currentDampingEnvironment == "negative" || $currentDampingEnvironment == "practice_negative" } {
     applyDamping $negativeDamping_IE $negativeDamping_DP
     
-  } elseif {$currentDampingEnvironment == "positive"} {
+  } elseif {$currentDampingEnvironment == "positive" || $currentDampingEnvironment == "practice_positive" } {
     applyDamping $positiveDamping_IE $positiveDamping_DP
     
   } else {
