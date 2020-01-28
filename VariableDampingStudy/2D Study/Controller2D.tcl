@@ -13,10 +13,13 @@ bind . <Key-q> done
 set targetOrientation "IE"
 
 # Damping environments and the number of blocks for each (place in order)
-set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_negative 1} {practice_variable 1} {positive 5} {negative 5} {variable 5}]
+set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_negative 1} {practice_variable 1} {positive 3} {negative 3} {variable 3}]
 
-# Number of trials in a block, should be even in order to ensure equal number of trials in both directions
+# Number of trials in a block, should be even in order to ensure equal number of trials in both directions for 1D trials
+# NOTE: Data collection blocks will have 15 trials per block (the last 9 blocks)
 set trialsPerBlock 10
+set extraTrialsForDataCollection 5
+
 # Damping values
 set negativeDamping_IE -0.5
 set positiveDamping_IE 1
@@ -42,7 +45,8 @@ foreach x $dampingEnvironments {
 set blocks [llength $everyBlockEnvironment]
 
 # Calculate the total number of trials
-set totalTrials [expr $blocks*$trialsPerBlock]
+#set totalTrials [expr $blocks*$trialsPerBlock]
+set totalTrials [expr $blocks*$trialsPerBlock + $extraTrialsForDataCollection*9]
 
 # -------------------Constants------------------------
 
@@ -324,18 +328,9 @@ proc endBlock {currentBlock} {
   global targetPositionsInBlock17_Y
   global targetPositionsInBlock18_X
   global targetPositionsInBlock18_Y
-  global targetPositionsInBlock19_X
-  global targetPositionsInBlock19_Y
-  global targetPositionsInBlock20_X
-  global targetPositionsInBlock20_Y
-  global targetPositionsInBlock21_X
-  global targetPositionsInBlock21_Y
-  global targetPositionsInBlock22_X
-  global targetPositionsInBlock22_Y
-  global targetPositionsInBlock23_X
-  global targetPositionsInBlock23_Y
-  global targetPositionsInBlock24_X
-  global targetPositionsInBlock24_Y
+
+  global trialsPerBlock
+
   
   puts "End of block $currentBlock"
   
@@ -461,6 +456,9 @@ proc endBlock {currentBlock} {
     # Block 10
     if {[expr $currentBlock + 1] == 10} {
       set targetOrientation "2D"
+      # There are now 15 trials per block
+      set trialsPerBlock 15
+      puts "There will now be 15 trials per block"
       set targetPositionsInBlock_X $targetPositionsInBlock10_X
       set targetPositionsInBlock_Y $targetPositionsInBlock10_Y
       puts "2D NEW TARGET LOCATIONS 10"
@@ -520,48 +518,6 @@ proc endBlock {currentBlock} {
       set targetPositionsInBlock_X $targetPositionsInBlock18_X
       set targetPositionsInBlock_Y $targetPositionsInBlock18_Y
       puts "2D NEW TARGET LOCATIONS 18"
-    }
-    # Block 19
-    if {[expr $currentBlock + 1] == 19} {
-      set targetOrientation "2D"
-      set targetPositionsInBlock_X $targetPositionsInBlock19_X
-      set targetPositionsInBlock_Y $targetPositionsInBlock19_Y
-      puts "2D NEW TARGET LOCATIONS 19"
-    }
-    # Block 20
-    if {[expr $currentBlock + 1] == 20} {
-      set targetOrientation "2D"
-      set targetPositionsInBlock_X $targetPositionsInBlock20_X
-      set targetPositionsInBlock_Y $targetPositionsInBlock20_Y
-      puts "2D NEW TARGET LOCATIONS 20"
-    }
-    # Block 21
-    if {[expr $currentBlock + 1] == 21} {
-      set targetOrientation "2D"
-      set targetPositionsInBlock_X $targetPositionsInBlock21_X
-      set targetPositionsInBlock_Y $targetPositionsInBlock21_Y
-      puts "2D NEW TARGET LOCATIONS 21"
-    }
-    # Block 22
-    if {[expr $currentBlock + 1] == 22} {
-      set targetOrientation "2D"
-      set targetPositionsInBlock_X $targetPositionsInBlock22_X
-      set targetPositionsInBlock_Y $targetPositionsInBlock22_Y
-      puts "2D NEW TARGET LOCATIONS 22"
-    }
-    # Block 23
-    if {[expr $currentBlock + 1] == 23} {
-      set targetOrientation "2D"
-      set targetPositionsInBlock_X $targetPositionsInBlock23_X
-      set targetPositionsInBlock_Y $targetPositionsInBlock23_Y
-      puts "2D NEW TARGET LOCATIONS 23"
-    }
-    # Block 24
-    if {[expr $currentBlock + 1] == 24} {
-      set targetOrientation "2D"
-      set targetPositionsInBlock_X $targetPositionsInBlock24_X
-      set targetPositionsInBlock_Y $targetPositionsInBlock24_Y
-      puts "2D NEW TARGET LOCATIONS 24"
     }
     
     # Remove the appropriate stiffness to continue the trials
