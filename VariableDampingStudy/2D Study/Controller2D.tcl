@@ -13,7 +13,33 @@ bind . <Key-q> done
 set targetOrientation "IE"
 
 # Damping environments and the number of blocks for each (place in order)
-set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_negative 1} {practice_variable 1} {positive 3} {negative 3} {variable 3}]
+#set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_negative 1} {practice_variable 1} {positive 3} {negative 3} {variable 3}]
+
+###############################################################
+# SIX DIFFERENT PATTERNS FOR THE STRUCTURE OF THE STUDY BELOW #
+###############################################################
+
+# Pattern 1: P N V
+set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_negative 1} {practice_variable 1} {positive 1} {negative 1} {variable 1} {positive 1} {negative 1} {variable 1} {positive 1} {negative 1} {variable 1}]
+
+# Pattern 2: P V N
+#set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_variable 1} {practice_negative 1} {positive 1} {variable 1} {negative 1} {positive 1} {variable 1} {negative 1} {positive 1} {variable 1} {negative 1}]
+
+# Pattern 3: N V P
+#set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_negative 1} {practice_variable 1} {practice_positive 1} {negative 1} {variable 1} {positive 1} {negative 1} {variable 1} {positive 1} {negative 1} {variable 1} {positive 1}]
+
+# Pattern 4: N P V
+#set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_negative 1} {practice_positive 1} {practice_variable 1} {negative 1} {positive 1} {variable 1} {negative 1} {positive 1} {variable 1} {negative 1} {positive 1} {variable 1}]
+
+# Pattern 5: V N P
+#set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_negative 1} {practice_positive 1} {variable 1} {negative 1} {positive 1} {variable 1} {negative 1} {positive 1} {variable 1} {negative 1} {positive 1}]
+
+# Pattern 6: V P N
+#set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_positive 1} {practice_negative 1} {variable 1} {positive 1} {negative 1} {variable 1} {positive 1} {negative 1} {variable 1} {positive 1} {negative 1}]
+
+###############################################################
+# SIX DIFFERENT PATTERNS FOR THE STRUCTURE OF THE STUDY ABOVE #
+###############################################################
 
 # Number of trials in a block, should be even in order to ensure equal number of trials in both directions for 1D trials
 # NOTE: Data collection blocks will have 15 trials per block (the last 9 blocks)
