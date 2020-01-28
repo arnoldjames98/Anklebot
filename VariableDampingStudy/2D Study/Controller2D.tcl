@@ -701,6 +701,18 @@ proc applyDamping {damping_IE damping_DP} {
 
 # End of trials
 proc endTrials {} {
+  global selectedK_pos_IE
+  global selectedK_neg_IE
+  global selectedK_pos_DP
+  global selectedK_neg_DP
+
+  # Print out the K values to remind 
+  puts "SAVE TERMINAL WINDOW FOR K VALUES: Shift+Ctrl+A to select all, then Edit>Copy, and paste in text file."
+  puts "selectedK_pos_IE = $selectedK_pos_IE"
+  puts "selectedK_neg_IE = $selectedK_neg_IE"
+  puts "selectedK_pos_DP = $selectedK_pos_DP"
+  puts "selectedK_neg_DP = $selectedK_neg_DP"
+
   puts "End of trials"
   wshm ankle_stiff_DP 50.0
   wshm ankle_stiff_IE 50.0
