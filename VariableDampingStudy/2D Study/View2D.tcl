@@ -442,7 +442,7 @@ every 10 {
           # What happens after a target at a distance is met and new neutral target just appeared
           if {$currentTarget_X == 0 && $currentTarget_Y == 0} {
             # For 2D case, always send a 1 to signify target was shown in log
-            sendTargetDistanceSignal 1
+            sendTargetDistanceSignal $currentTarget_X $currentTarget_Y
             
             # Neutral target, random time range to be met (How long is needed to stay inside the target to meet the target)
             set requiredTimeInsideTarget [randomInRange $neutralTimeRange]
@@ -472,7 +472,7 @@ every 10 {
             }
             
             # Sends a signal to the controller that shows the distance of the target (just send a 1 for 2D)
-            sendTargetDistanceSignal 1
+            sendTargetDistanceSignal $currentTarget_X $currentTarget_Y
             
             # Play an audio file at the start of each trial, using a bash script
             exec bash /home/imt/imt/robot4/protocols/ankle/VariableDampingStudy/Supporting/playSound.sh &
@@ -589,7 +589,11 @@ every 10 {
           if {$currentTarget == 0} {
             
             # Sends a signal to the controller that shows the distance of the target, will be 0 in this case
-            sendTargetDistanceSignal $currentTarget
+            if {$targetOrientation == "DP"} {
+            	sendTargetDistanceSignal 0 $currentTarget
+            } elseif {$targetOrientation == "IE"} {
+            	sendTargetDistanceSignal $currentTarget 0
+            }
             
             # Neutral target, random time range to be met (How long is needed to stay inside the target to meet the target)
             set requiredTimeInsideTarget [randomInRange $neutralTimeRange]
@@ -614,7 +618,11 @@ every 10 {
             set currentTrial [expr $currentTrial + 1]
             
             # Sends a signal to the controller that shows the distance of the target
-            sendTargetDistanceSignal $currentTarget
+            if {$targetOrientation == "DP"} {
+            	sendTargetDistanceSignal 0 $currentTarget
+            } elseif {$targetOrientation == "IE"} {
+            	sendTargetDistanceSignal $currentTarget 0
+            }
             
             # Play an audio file at the start of each trial, using a bash script
             exec bash /home/imt/imt/robot4/protocols/ankle/VariableDampingStudy/Supporting/playSound.sh &

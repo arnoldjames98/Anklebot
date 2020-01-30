@@ -209,7 +209,9 @@ if {[rshm paused]} {
   done
 }
 
-wshm logfnid 22
+# Specificies which C log function to use (id defined in pl_ulog.c and function defined in an_ulog.c)
+# 23 is the new one for 2D, 22 was the old one for 1D
+wshm logfnid 23
 
 # Load ankle parameters from shm.tcl (this might not be needed)
 wshm ankle_stiff 300.0
@@ -740,8 +742,9 @@ proc neutralReturn {} {
 }
 
 # Send a signal to the log file that represents the start of a trial (target at a distance has appeared)
-proc sendTargetDistanceSignal {targetDistance} {
-  wshm ankle_target_Distance $targetDistance
+proc sendTargetDistanceSignal {targetDistance_IE targetDistance_DP} {
+  wshm ankle_target_Distance_IE $targetDistance_IE
+  wshm ankle_target_Distance_DP $targetDistance_DP
 }
 
 
@@ -781,6 +784,7 @@ every 10 {
   global selectedK_neg_IE
   global selectedK_pos_DP
   global selectedK_neg_DP
+  global currentTarget
   
   # When k is being calculated OR variable damping (1D or 2D) is enabled, need to find vel and accel
   if {$calculatingK == 1 || $enablingVariableDamping == 1 || $enablingVariableDamping == 2} {
@@ -805,7 +809,8 @@ every 10 {
   if {$calculatingK == 1} {
     # If the target is set at the neutral position, do not need to collect data to calculate k
     # Data not being used for calculation of K
-    if {[rshm ankle_target_Distance] == 0 } {
+    # No longer reads the log file to see, instead calls global variable from View2D.tcl
+    if {$currentTarget == 0 } {
       #puts "Current data not being used for calculation of k"
       
       # Calculate the extrema values of filtered velocity times filtered acceleration
