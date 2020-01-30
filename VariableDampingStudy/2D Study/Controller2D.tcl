@@ -182,7 +182,7 @@ source $ob(crobhome)/shm.tcl
 cd $ob(crobhome)/tools
 
 # Columns in the .dat file (found in an_ulog.c)
-set ob(nlog) 24
+set ob(nlog) 25
 
 # Specifies the controller being used
 set ob(ankle_pt_ctl) 15
@@ -210,7 +210,7 @@ if {[rshm paused]} {
 }
 
 # Specificies which C log function to use (id defined in pl_ulog.c and function defined in an_ulog.c)
-# 23 is the new one for 2D, 22 was the old one for 1D
+# 23 is the new one for 2D, 22 was the old one for 1D, had to also set ob(nlog) to 25 above since 25 col now
 wshm logfnid 23
 
 # Load ankle parameters from shm.tcl (this might not be needed)
