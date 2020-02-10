@@ -210,6 +210,21 @@ proc buttonAction {place} {
   }
 }
 
+# Predefined paths for 2D data collection trials
+# These paths are designed so that the +/- x-direction total distance both equal 51.1 degrees
+# and the +/- y-direction total distance both equal 102.2 degrees
+# Path 1
+set path1_X [list 0.0 -5.8 2.0 -4.5 5.2 1.0 -3.5 1.2 -3.0 3.9 -3.5 -6.2 0.5 -3.3 7.1 -4.9 0.0]
+set path1_Y [list 0.0 6.5 -12.5 -6.5 1.9 -12.8 9.7 -3.9 13.0 -1.5 7.3 -0.3 14.1 -8.6 3.6 -6.5 0.0]
+
+# Path 2          
+set path2_X [list 0.0 6.5 -1.6 -6.0 -3.2 4.1 -1.6 4.9 1.7 -3.8 -1.0 5.3 -6.5 2.5 7.3 -5.1 0.0]
+set path2_Y [list 0.0 -7.7 8.0 14.0 0.9 11.3 -14.0 -7.5 6.8 -4.6 2.4 -9.3 12.2 -6.3 2.4 14.5 0.0]
+
+# Path 3      
+set path3_X [list 0.0 -4.6 2.9 -3.3 1.3 6.8 -5.2 1.5 -4.6 4.0 -0.2 -4.5 7.1 -1.4 5.2 2.6 0.0]
+set path3_Y [list 0.0 -13.9 6.2 -0.2 -14.7 12.0 -1.3 11.4 -8.8 5.8 -6.4 0.0 12.9 2.7 -4.5 4.3 0.0]
+
 # Target Positions in the tuning blocks
 # These are both for the x direction
 set targetPositionsInBlock1_IE [list 0.000 7.5 0.000 -7.5 0.000 -7.5 0.000 7.5 0.000 -7.5 0.000 7.5 0.000 -7.5 0.000 7.5 0.000 -7.5 0.000 7.5 0.000]
@@ -221,7 +236,7 @@ set targetPositionsInBlock5_DP [list 0.000 15.0 0.000 -15.0 0.000 15.0 0.000 15.
 set targetPositionsInBlock6_DP [list 0.000 -15.0 0.000 15.0 0.000 15.0 0.000 -15.0 0.000 15.0 0.000 -15.0 0.000 15.0 0.000 15.0 0.000 -15.0 0.000 -15.0 0.000]
 
 # The rest are pairs of x and y vectors cooresponding to the following 3 blocks
-# Practice set of 3 pairs
+# Practice set of 3 pairs (only 10 trials, completely random target placement)
 set targetPositionsInBlock7_X [list 0.000 -5.595 1.985 -3.323 6.863 -5.136 4.504 -1.174 4.383 -6.964 6.510 0.000]
 set targetPositionsInBlock7_Y [list 0.000 12.401 -12.074 1.406 13.947 -0.439 -10.743 12.472 4.672 10.474 5.362 0.000]
 
@@ -231,36 +246,37 @@ set targetPositionsInBlock8_Y [list 0.000 -10.841 10.222 -4.500 3.481 -4.450 2.5
 set targetPositionsInBlock9_X [list 0.000 -4.772 5.539 0.748 5.295 -2.236 -6.360 -1.241 6.672 -0.161 4.204 0.000]
 set targetPositionsInBlock9_Y [list 0.000 -7.086 2.391 -10.651 3.662 -2.946 -11.300 12.081 -0.274 12.002 -11.664 0.000]
 
-# The rest are pairs of x and y vectors cooresponding to the following 15 blocks for data collection
+# The rest are pairs of x and y vectors cooresponding to the following 9 blocks for data collection
+
 # First set of three pairs
-set targetPositionsInBlock10_X [list 0.000 3.806 -6.691 4.188 -5.551 -0.459 4.414 0.428 -3.555 4.887 0.575 6.928 -6.233 -3.602 -1.029 -3.543 0.000]
-set targetPositionsInBlock10_Y [list 0.000 -12.724 0.924 13.020 2.065 -14.643 -5.664 3.059 -12.485 12.400 -12.655 8.247 -3.007 9.002 -9.545 11.079 0.000]
+set targetPositionsInBlock10_X $path1_X
+set targetPositionsInBlock10_Y $path1_Y
 
-set targetPositionsInBlock11_X [list 0.000 -5.326 1.831 -6.360 -1.241 6.672 -0.161 4.204 -1.654 -6.053 6.631 1.128 -3.978 4.818 -6.855 3.476 0.000]
-set targetPositionsInBlock11_Y [list 0.000 10.591 -4.471 -11.300 12.081 -0.274 12.002 -11.664 -2.883 -11.041 13.684 -13.207 -4.405 -14.538 4.473 -1.472 0.000]
+set targetPositionsInBlock11_X $path2_X
+set targetPositionsInBlock11_Y $path2_Y
 
-set targetPositionsInBlock12_X [list 0.000 -4.644 2.171 -4.636 1.343 -3.143 7.240 3.454 6.095 -3.589 1.415 -1.121 -5.078 1.478 -6.996 0.463 0.000]
-set targetPositionsInBlock12_Y [list 0.000 14.449 -3.712 -11.382 -3.461 3.513 9.731 -4.684 -11.767 9.533 -14.325 -5.618 -12.173 -0.872 5.997 -5.412 0.000]
+set targetPositionsInBlock12_X $path3_X
+set targetPositionsInBlock12_Y $path3_Y
 
 # Next set of three pairs
-set targetPositionsInBlock13_X [list 0.000 -6.546 1.918 7.091 -5.417 0.455 5.417 0.301 -5.250 3.824 -3.858 2.817 -1.579 -7.206 -4.544 -1.051 0.000]
-set targetPositionsInBlock13_Y [list 0.000 7.905 12.986 -9.239 5.888 0.762 7.238 -4.569 2.583 -13.666 -1.728 7.090 -1.731 -6.892 9.652 -3.265 0.000]
+set targetPositionsInBlock13_X $path2_X
+set targetPositionsInBlock13_Y $path2_Y
 
-set targetPositionsInBlock14_X [list 0.000 4.628 -1.839 4.356 -2.587 4.033 0.216 5.764 -5.179 -1.396 4.884 0.511 -5.824 -0.072 -6.675 0.908 0.000]
-set targetPositionsInBlock14_Y [list 0.000 7.652 -8.519 13.479 5.138 -9.982 14.696 2.641 -9.004 7.461 -5.444 -12.301 5.360 -9.309 10.521 2.484 0.000]
+set targetPositionsInBlock14_X $path3_X
+set targetPositionsInBlock14_Y $path3_Y
 
-set targetPositionsInBlock15_X [list 0.000 -5.927 4.266 1.553 -1.013 3.871 6.506 -4.688 -0.186 -3.406 2.599 -0.724 -6.609 4.091 -5.620 -1.153 0.000]
-set targetPositionsInBlock15_Y [list 0.000 -11.631 -6.253 13.933 5.843 -2.021 -11.707 8.935 -3.120 -13.883 -2.113 3.296 -5.526 5.893 -11.095 4.667 0.000]
+set targetPositionsInBlock15_X $path1_X
+set targetPositionsInBlock15_Y $path1_Y
 
 # Final set of three pairs
-set targetPositionsInBlock16_X [list 0.000 -5.868 -2.738 5.894 0.836 -4.320 3.101 -2.799 1.837 -4.944 -1.548 2.761 7.243 -5.184 5.567 -2.238 0.000]
-set targetPositionsInBlock16_Y [list 0.000 -11.205 -5.507 6.097 -9.467 12.414 1.734 -10.014 14.638 -7.266 -12.780 -2.928 3.620 -3.560 7.743 -6.176 0.000]
+set targetPositionsInBlock16_X $path3_X
+set targetPositionsInBlock16_Y $path3_Y
 
-set targetPositionsInBlock17_X [list 0.000 3.513 6.861 -4.143 -6.824 3.348 -7.175 4.508 1.759 -3.771 -0.725 7.292 0.535 7.337 2.758 5.985 0.000]
-set targetPositionsInBlock17_Y [list 0.000 -9.694 12.737 -3.793 4.203 -4.577 12.317 -3.501 2.265 -6.748 9.133 -14.100 9.063 -12.992 8.512 -10.864 0.000]
+set targetPositionsInBlock17_X $path1_X
+set targetPositionsInBlock17_Y $path1_Y
 
-set targetPositionsInBlock18_X [list 0.000 -6.873 1.747 -2.183 7.265 2.650 -2.450 0.418 3.758 -6.261 7.442 -0.680 4.243 -6.860 -1.827 3.443 0.000]
-set targetPositionsInBlock18_Y [list 0.000 -11.792 13.190 -2.681 13.367 8.005 -7.675 5.405 0.355 6.587 -4.364 -11.230 6.783 -14.706 6.130 -8.272 0.000]
+set targetPositionsInBlock18_X $path2_X
+set targetPositionsInBlock18_Y $path2_Y
 
 
 # Initialize the targets for the first block
