@@ -12,6 +12,7 @@ source Controller2D.tcl
 
 # Time required to meet targets, in ms
 set targetTime 2000
+
 # No time randomization in this study, but still used for tuning trials
 set neutralTimeRange [list 1500 4000]
 
@@ -395,6 +396,7 @@ every 10 {
   global blocks
   global currentTrial
   global totalTrials
+  global pathLine
   
   global innerCursor_DP
   global outerCursor_DP
@@ -430,6 +432,9 @@ every 10 {
       if {[ expr $currentTarget_X - $targetRadius ] <= $innerCursor_IE && [ expr $currentTarget_X + $targetRadius ] >= $outerCursor_IE && [ expr $currentTarget_Y - $targetRadius ] <= $innerCursor_DP && [ expr $currentTarget_Y + $targetRadius ] >= $outerCursor_DP } {
         # Visual feedback that user is inside of target
         .right.view itemconfigure $::target -fill $insideTargetColor
+
+        # Delete the previous pathLine when the target is hit
+        .right.view delete pathLine
         
         # Start counting how long the user is in the the target in ms
         set timeInsideTarget [expr $timeInsideTarget + 10]
@@ -454,6 +459,10 @@ every 10 {
           #set currentTarget [lindex $targetPositionsInBlock 0 $i]
           set currentTarget_X [lindex $targetPositionsInBlock_X $i]
           set currentTarget_Y [lindex $targetPositionsInBlock_Y $i]
+
+          # Previous target (used to draw straight line between the previous and current targets)
+          set previousTarget_X [lindex $targetPositionsInBlock_X [expr $i - 1]]
+          set previousTarget_Y [lindex $targetPositionsInBlock_Y [expr $i - 1]]
           
           # What happens after a target at a distance is met and new neutral target just appeared
           if {$currentTarget_X == 0 && $currentTarget_Y == 0} {
@@ -475,6 +484,9 @@ every 10 {
               
               # Delete text that says "Go!"
               .right.view delete goText
+
+              # Delete the previous pathLine
+              .right.view delete pathLine
             }
             # What happens when a neutral target is met and a target at a distance has just appeared
           } else {
@@ -503,6 +515,9 @@ every 10 {
               
               # Delete text that says "Go!"
               .right.view delete goText
+
+              # Delete the previous pathLine
+              .right.view delete pathLine
             }
             
             # Show text that says "Go!" next to or above the target, depending on whether the trial is DP or IE
@@ -516,9 +531,15 @@ every 10 {
             }
           }
           
+
           # Draw the new target
           .right.view coords $::target [drawCircle $currentTarget_X $currentTarget_Y $targetRadius ]
-          
+
+          # Draw a line to the target
+          if {$i > 0} {
+            .right.view create line [drawLine $previousTarget_X $previousTarget_Y $currentTarget_X $currentTarget_Y] -fill $targetColor -tags pathLine -width 3 -dash -
+          }
+
           # Places the target on the correct coordinate axis for DP vs IE studies
           if {$targetOrientation == "DP"} {
             .right.view coords $::target [drawCircle 0 $currentTarget $targetRadius ]
