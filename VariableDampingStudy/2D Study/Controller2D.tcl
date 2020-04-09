@@ -23,7 +23,7 @@ set targetOrientation "IE"
 #set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_negative 1} {practice_variable 1} {positive 1} {negative 1} {variable 1} {positive 1} {negative 1} {variable 1} {positive 1} {negative 1} {variable 1}]
 
 # Pattern 2: P V N
-set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_variable 1} {practice_negative 1} {positive 1} {variable 1} {negative 1} {positive 1} {variable 1} {negative 1} {positive 1} {variable 1} {negative 1}]
+#set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_variable 1} {practice_negative 1} {positive 1} {variable 1} {negative 1} {positive 1} {variable 1} {negative 1} {positive 1} {variable 1} {negative 1}]
 
 # Pattern 3: N V P
 #set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_negative 1} {practice_variable 1} {practice_positive 1} {negative 1} {variable 1} {positive 1} {negative 1} {variable 1} {positive 1} {negative 1} {variable 1} {positive 1}]
@@ -35,7 +35,7 @@ set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2
 #set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_negative 1} {practice_positive 1} {variable 1} {negative 1} {positive 1} {variable 1} {negative 1} {positive 1} {variable 1} {negative 1} {positive 1}]
 
 # Pattern 6: V P N
-#set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_positive 1} {practice_negative 1} {variable 1} {positive 1} {negative 1} {variable 1} {positive 1} {negative 1} {variable 1} {positive 1} {negative 1}]
+set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_positive 1} {practice_negative 1} {variable 1} {positive 1} {negative 1} {variable 1} {positive 1} {negative 1} {variable 1} {positive 1} {negative 1}]
 
 ###############################################################
 # SIX DIFFERENT PATTERNS FOR THE STRUCTURE OF THE STUDY ABOVE #
