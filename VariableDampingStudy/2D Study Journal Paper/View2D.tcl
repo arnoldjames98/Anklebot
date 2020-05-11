@@ -11,12 +11,12 @@ source Controller2D.tcl
 #set targetDistance 7.5
 
 # Time required to meet targets, in ms
-#set targetTime 2000
-set targetTime 1000
+set targetTime 2000
+#set targetTime 1000 # Uncomment this line for testing the study quickly
 
 # No time randomization in this study, but still used for tuning trials
-#set neutralTimeRange [list 1500 4000]
-set neutralTimeRange [list 1000 1500]
+set neutralTimeRange [list 1500 4000]
+#set neutralTimeRange [list 1000 1500] # Uncomment this line for testing the study quickly
 
 # Radii of the cursor and target in degrees
 set cursorRadius 1
