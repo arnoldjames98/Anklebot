@@ -12,11 +12,13 @@ source Controller2D.tcl
 
 # Time required to meet targets, in ms
 set targetTime 2000
-#set targetTime 1000 # Uncomment this line for testing the study quickly
+# Uncomment this line for testing the study quickly
+#set targetTime 500
 
 # No time randomization in this study, but still used for tuning trials
 set neutralTimeRange [list 1500 4000]
-#set neutralTimeRange [list 1000 1500] # Uncomment this line for testing the study quickly
+ # Uncomment this line for testing the study quickly
+#set neutralTimeRange [list 500 1000]
 
 # Radii of the cursor and target in degrees
 set cursorRadius 1
@@ -245,30 +247,32 @@ set targetPositionsInBlock6_DP [list 0.000 -15.0 0.000 15.0 0.000 15.0 0.000 -15
 
 # The rest are pairs of x and y vectors cooresponding to the following 3 blocks
 # Practice set of 3 pairs (only 10 trials, completely random target placement)
-set targetPositionsInBlock7_X $path1_X
-set targetPositionsInBlock7_Y $path1_Y
+set targetPositionsInBlock7_X $path3_X
+set targetPositionsInBlock7_Y $path3_Y
 
-set targetPositionsInBlock8_X $path2_X
-set targetPositionsInBlock8_Y $path2_Y
+set targetPositionsInBlock8_X $path4_X
+set targetPositionsInBlock8_Y $path4_Y
 
 # The rest are pairs of x and y vectors cooresponding to the following blocks for data collection
-set targetPositionsInBlock9_X $path3_X
-set targetPositionsInBlock9_Y $path3_Y
+set targetPositionsInBlock9_X $path1_X
+set targetPositionsInBlock9_Y $path1_Y
 
-set targetPositionsInBlock10_X $path4_X
-set targetPositionsInBlock10_Y $path4_Y
+set targetPositionsInBlock10_X $path2_X
+set targetPositionsInBlock10_Y $path2_Y
 
-set targetPositionsInBlock11_X $path2_X
-set targetPositionsInBlock11_Y $path2_Y
+set targetPositionsInBlock11_X $path3_X
+set targetPositionsInBlock11_Y $path3_Y
+
 
 set targetPositionsInBlock12_X $path1_X
 set targetPositionsInBlock12_Y $path1_Y
 
-set targetPositionsInBlock13_X $path4_X
-set targetPositionsInBlock13_Y $path4_Y
+set targetPositionsInBlock13_X $path2_X
+set targetPositionsInBlock13_Y $path2_Y
 
 set targetPositionsInBlock14_X $path3_X
 set targetPositionsInBlock14_Y $path3_Y
+
 
 set targetPositionsInBlock15_X $path1_X
 set targetPositionsInBlock15_Y $path1_Y
@@ -282,17 +286,18 @@ set targetPositionsInBlock17_Y $path3_Y
 set targetPositionsInBlock18_X $path4_X
 set targetPositionsInBlock18_Y $path4_Y
 
-set targetPositionsInBlock19_X $path2_X
-set targetPositionsInBlock19_Y $path2_Y
 
-set targetPositionsInBlock20_X $path1_X
-set targetPositionsInBlock20_Y $path1_Y
+set targetPositionsInBlock19_X $path1_X
+set targetPositionsInBlock19_Y $path1_Y
 
-set targetPositionsInBlock21_X $path4_X
-set targetPositionsInBlock21_Y $path4_Y
+set targetPositionsInBlock20_X $path2_X
+set targetPositionsInBlock20_Y $path2_Y
 
-set targetPositionsInBlock22_X $path3_X
-set targetPositionsInBlock22_Y $path3_Y
+set targetPositionsInBlock21_X $path3_X
+set targetPositionsInBlock21_Y $path3_Y
+
+set targetPositionsInBlock22_X $path4_X
+set targetPositionsInBlock22_Y $path4_Y
 
 
 # Initialize the targets for the first block
@@ -355,7 +360,12 @@ set center [.right.view create oval [drawCircle 0 0 0.1 ] -fill $gridColor -outl
 # Load the file that allows for the creation of a graph in tcl (used for calculation of k)
 source /home/imt/imt/robot4/protocols/ankle/VariableDampingStudy/Supporting/Graph.tcl
 #emu_graph::emu_graph foo -canvas .right.view -width 600 -height 300 -xref 200 -yref 600
-emu_graph::emu_graph responseGraph -canvas .right.view -width 600 -height 300 -xref 200 -yref 600
+
+# Uncomment this line to view the plot
+# emu_graph::emu_graph responseGraph -canvas .right.view -width 600 -height 300 -xref 200 -yref 600
+
+# Intentionally put the plot off of the page so the subject can't see it (comment this out to view plot)
+emu_graph::emu_graph responseGraph -canvas .right.view -width 600 -height 300 -xref 20000 -yref 60000
 
 
 # ----------------------Loops----------------------

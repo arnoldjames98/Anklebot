@@ -16,17 +16,17 @@ set targetOrientation "IE"
 #set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_negative 1} {practice_variable 1} {positive 3} {negative 3} {variable 3}]
 
 ###############################################################
-# SIX DIFFERENT PATTERNS FOR THE STRUCTURE OF THE STUDY BELOW #
+# TWO DIFFERENT PATTERNS FOR THE STRUCTURE OF THE STUDY BELOW #
 ###############################################################
 
-# Pattern 1: P V
-set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_variable 1} {positive 1} {variable 1} {positive 1} {variable 1} {positive 1} {variable 1} {positive 1} {variable 1} {positive 1} {variable 1} {positive 1} {variable 1} {positive 1} {variable 1} ]
+# Pattern 1: PPP VVV PPPP VVVV
+set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_variable 1} {positive 3} {variable 3} {positive 4} {variable 4} ]
 
-# Pattern 2: P V
-set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_positive 1} {variable 1} {positive 1} {variable 1} {positive 1} {variable 1} {positive 1} {variable 1} {positive 1} {variable 1} {positive 1} {variable 1} {positive 1} {variable 1} {positive 1} ]
+# Pattern 2: VVV PPP VVVV PPPP
+set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_positive 1} {variable 3} {positive 3} {variable 4} {positive 4} ]
 
 ###############################################################
-# SIX DIFFERENT PATTERNS FOR THE STRUCTURE OF THE STUDY ABOVE #
+# TWO DIFFERENT PATTERNS FOR THE STRUCTURE OF THE STUDY ABOVE #
 ###############################################################
 
 # Number of trials in a block, should be even in order to ensure equal number of trials in both directions for 1D trials
@@ -142,7 +142,9 @@ proc logSetup {name type} {
   
   #Removes all spaces
   set fn [string map {" " ""} $fn]
-  puts $fn
+  
+  # To see the name of the .dat file that is being created
+  #puts $fn
   
   # Directory where the logs are to be saved
   set baselogdir /home/imt/logs/Hyunglae/AnkleReflexStudy
@@ -406,14 +408,14 @@ proc endBlock {currentBlock} {
       # Not needed
       set targetOrientation "IE"
       set targetPositionsInBlock $targetPositionsInBlock2_IE
-      puts "IE NEW TARGET LOCATIONS 2"
+      #puts "IE NEW TARGET LOCATIONS 2"
     }
     # Block 3
     if {[expr $currentBlock + 1] == 3} {
       # Not needed
       set targetOrientation "IE"
       set targetPositionsInBlock $targetPositionsInBlock3_IE
-      puts "IE NEW TARGET LOCATIONS 3"
+      #puts "IE NEW TARGET LOCATIONS 3"
     }
 
     ############################# DP TUNING #############################
@@ -429,19 +431,19 @@ proc endBlock {currentBlock} {
       
       set targetOrientation "DP"
       set targetPositionsInBlock $targetPositionsInBlock4_DP
-      puts "DP NEW TARGET LOCATIONS 4"
+      #puts "DP NEW TARGET LOCATIONS 4"
     }
     # Block 5
     if {[expr $currentBlock + 1] == 5} {
       set targetOrientation "DP"
       set targetPositionsInBlock $targetPositionsInBlock5_DP
-      puts "DP NEW TARGET LOCATIONS 5"
+      #puts "DP NEW TARGET LOCATIONS 5"
     }
     # Block 6
     if {[expr $currentBlock + 1] == 6} {
       set targetOrientation "DP"
       set targetPositionsInBlock $targetPositionsInBlock6_DP
-      puts "DP NEW TARGET LOCATIONS 6"
+      #puts "DP NEW TARGET LOCATIONS 6"
     }
 
     ############################# PRACTICE BLOCKS #############################
@@ -458,117 +460,115 @@ proc endBlock {currentBlock} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock7_X
       set targetPositionsInBlock_Y $targetPositionsInBlock7_Y
-      puts "2D NEW TARGET LOCATIONS 7 (PRACTICE)"
+      #puts "2D NEW TARGET LOCATIONS 7 (PRACTICE)"
     }
     # Block 8
     if {[expr $currentBlock + 1] == 8} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock8_X
       set targetPositionsInBlock_Y $targetPositionsInBlock8_Y
-      puts "2D NEW TARGET LOCATIONS 8 (PRACTICE)"
+      #puts "2D NEW TARGET LOCATIONS 8 (PRACTICE)"
     }
+    ############################# DATA COLLECTION BLOCKS #############################
     # Block 9
     if {[expr $currentBlock + 1] == 9} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock9_X
       set targetPositionsInBlock_Y $targetPositionsInBlock9_Y
-      puts "2D NEW TARGET LOCATIONS 9 (PRACTICE)"
+      #puts "2D NEW TARGET LOCATIONS 9"
     }
-
-    ############################# DATA COLLECTION BLOCKS #############################
     # Block 10
     if {[expr $currentBlock + 1] == 10} {
       set targetOrientation "2D"
       # There are now 15 trials per block (NOT FOR THIS STUDY!)
       set trialsPerBlock 10
-      puts "There will still be 10 trials per block."
       set targetPositionsInBlock_X $targetPositionsInBlock10_X
       set targetPositionsInBlock_Y $targetPositionsInBlock10_Y
-      puts "2D NEW TARGET LOCATIONS 10"
+      #puts "2D NEW TARGET LOCATIONS 10"
     }
     # Block 11
     if {[expr $currentBlock + 1] == 11} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock11_X
       set targetPositionsInBlock_Y $targetPositionsInBlock11_Y
-      puts "2D NEW TARGET LOCATIONS 11"
+      #puts "2D NEW TARGET LOCATIONS 11"
     }
     # Block 12
     if {[expr $currentBlock + 1] == 12} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock12_X
       set targetPositionsInBlock_Y $targetPositionsInBlock12_Y
-      puts "2D NEW TARGET LOCATIONS 12"
+      #puts "2D NEW TARGET LOCATIONS 12"
     }
     # Block 13
     if {[expr $currentBlock + 1] == 13} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock13_X
       set targetPositionsInBlock_Y $targetPositionsInBlock13_Y
-      puts "2D NEW TARGET LOCATIONS 13"
+      #puts "2D NEW TARGET LOCATIONS 13"
     }
     # Block 14
     if {[expr $currentBlock + 1] == 14} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock14_X
       set targetPositionsInBlock_Y $targetPositionsInBlock14_Y
-      puts "2D NEW TARGET LOCATIONS 14"
+      #puts "2D NEW TARGET LOCATIONS 14"
     }
     # Block 15
     if {[expr $currentBlock + 1] == 15} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock15_X
       set targetPositionsInBlock_Y $targetPositionsInBlock15_Y
-      puts "2D NEW TARGET LOCATIONS 15"
+      #puts "2D NEW TARGET LOCATIONS 15"
     }
     # Block 16
     if {[expr $currentBlock + 1] == 16} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock16_X
       set targetPositionsInBlock_Y $targetPositionsInBlock16_Y
-      puts "2D NEW TARGET LOCATIONS 16"
+      #puts "2D NEW TARGET LOCATIONS 16"
     }
     # Block 17
     if {[expr $currentBlock + 1] == 17} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock17_X
       set targetPositionsInBlock_Y $targetPositionsInBlock17_Y
-      puts "2D NEW TARGET LOCATIONS 17"
+      #puts "2D NEW TARGET LOCATIONS 17"
     }
     # Block 18
     if {[expr $currentBlock + 1] == 18} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock18_X
       set targetPositionsInBlock_Y $targetPositionsInBlock18_Y
-      puts "2D NEW TARGET LOCATIONS 18"
+      #puts "2D NEW TARGET LOCATIONS 18"
     }
     # Block 19
     if {[expr $currentBlock + 1] == 19} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock19_X
       set targetPositionsInBlock_Y $targetPositionsInBlock19_Y
-      puts "2D NEW TARGET LOCATIONS 19"
+      #puts "2D NEW TARGET LOCATIONS 19"
     }
     # Block 20
     if {[expr $currentBlock + 1] == 20} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock20_X
       set targetPositionsInBlock_Y $targetPositionsInBlock20_Y
-      puts "2D NEW TARGET LOCATIONS 20"
+      #puts "2D NEW TARGET LOCATIONS 20"
     }
     # Block 21
     if {[expr $currentBlock + 1] == 21} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock21_X
       set targetPositionsInBlock_Y $targetPositionsInBlock21_Y
-      puts "2D NEW TARGET LOCATIONS 21"
+      #puts "2D NEW TARGET LOCATIONS 21"
     }
     # Block 22
     if {[expr $currentBlock + 1] == 22} {
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock22_X
       set targetPositionsInBlock_Y $targetPositionsInBlock22_Y
-      puts "2D NEW TARGET LOCATIONS 22"
+      #puts "2D NEW TARGET LOCATIONS 22"
     }
     
     # Remove the appropriate stiffness to continue the trials
@@ -609,7 +609,8 @@ proc endTrial {currentTrial} {
   set currentDampingEnvironment [lindex $everyBlockEnvironment [expr $currentBlock - 1]]
   
   # Output the current trial and its damping enviornment
-  puts "Trial $currentTrial of $totalTrials complete ($currentDampingEnvironment damping)"
+  #puts "Trial $currentTrial of $totalTrials complete ($currentDampingEnvironment damping)"
+  puts "Trial $currentTrial of $totalTrials complete"
   
   
   # Determine whether or not k needs to be calculated
@@ -671,7 +672,9 @@ proc setDampingEnvironment {currentBlock} {
   
   # Since everyBlockEnvironment is 0 indexed, need to subtract 1
   set currentDampingEnvironment [lindex $everyBlockEnvironment [expr $currentBlock - 1]]
-  puts "Damping environment: $currentDampingEnvironment damping"
+  
+ # To see information about the current damping enviornment of the block
+  #puts "Damping environment: $currentDampingEnvironment damping"
   
   # Apply the appropriate damping based on the current damping environment
   if {$currentDampingEnvironment == "zero" || $currentDampingEnvironment == "zero_IE" || $currentDampingEnvironment == "zero_DP" } {
