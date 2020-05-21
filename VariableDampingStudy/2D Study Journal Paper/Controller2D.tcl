@@ -20,10 +20,12 @@ set targetOrientation "IE"
 ###############################################################
 
 # Pattern 1: PPP VVV PPPP VVVV
-set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_variable 1} {positive 3} {variable 3} {positive 4} {variable 4} ]
+#set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_variable 1} {positive 3} {variable 3} {positive 4} {variable 4} ]
+#puts "Block Pattern 1"
 
 # Pattern 2: VVV PPP VVVV PPPP
 set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_positive 1} {variable 3} {positive 3} {variable 4} {positive 4} ]
+puts "Block Pattern 2"
 
 ###############################################################
 # TWO DIFFERENT PATTERNS FOR THE STRUCTURE OF THE STUDY ABOVE #

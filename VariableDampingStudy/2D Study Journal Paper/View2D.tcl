@@ -216,24 +216,24 @@ proc buttonAction {place} {
 }
 
 # Predefined paths for 2D data collection trials
-# These paths are designed so that the +/- x-direction total distance both equal 34.4 degrees
-# and the +/- y-direction total distance both equal 68.8 degrees
+# These paths are designed so that the +/- x-direction total distance both equal 30.5 degrees
+# and the +/- y-direction total distance both equal 61.0 degrees and fit inside and elliptical workspace
 
 # Path 1
-set path1_X [list 0.0 -6.1 6.8 -1.6 3.7 -1 2 6.2 -3.9 -7.1 1.9 0.0]
-set path1_Y [list 0.0 5.8 -10 14.2 1.7 11.6 -3 11.5 4.4 -14.4 -8.3 0.0]
+set path1_X [list 0.0 3.9 -2.4 2.4 -6.7 4.2 0.1 5.3 -0.8 -5.7 -1.6 0.0]
+set path1_Y [list 0.0 -7.5 13.8 5.8 -2.2 -9.4 -0.6 7.2 -3.1 5.9 -14.1 0.0]
 
 # Path 2          
-set path2_X [list 0.0 6.1 -6.8 1.6 -3.7 1 -2 -6.2 3.9 7.1 -1.9 0.0]
-set path2_Y [list 0.0 5.8 -10 14.2 1.7 11.6 -3 11.5 4.4 -14.4 -8.3 0.0]
+set path2_X [list 0.0 -3.9 2.4 -2.4 6.7 -4.2 -0.1 -5.3 0.8 5.7 1.6 0.0]
+set path2_Y [list 0.0 -7.5 13.8 5.8 -2.2 -9.4 -0.6 7.2 -3.1 5.9 -14.1 0.0]
 
 # Path 3      
-set path3_X [list 0.0 -6.1 6.8 -1.6 3.7 -1 2 6.2 -3.9 -7.1 1.9 0.0]
-set path3_Y [list 0.0 -5.8 10 -14.2 -1.7 -11.6 3 -11.5 -4.4 14.4 8.3 0.0]
+set path3_X [list 0.0 3.9 -2.4 2.4 -6.7 4.2 0.1 5.3 -0.8 -5.7 -1.6 0.0]
+set path3_Y [list 0.0 7.5 -13.8 -5.8 2.2 9.4 0.6 -7.2 3.1 -5.9 14.1 0.0]
 
 # Path 4     
-set path4_X [list 0.0 6.1 -6.8 1.6 -3.7 1 -2 -6.2 3.9 7.1 -1.9 0.0]
-set path4_Y [list 0.0 -5.8 10 -14.2 -1.7 -11.6 3 -11.5 -4.4 14.4 8.3 0.0]
+set path4_X [list 0.0 -3.9 2.4 -2.4 6.7 -4.2 -0.1 -5.3 0.8 5.7 1.6 0.0]
+set path4_Y [list 0.0 7.5 -13.8 -5.8 2.2 9.4 0.6 -7.2 3.1 -5.9 14.1 0.0]
 
 # Target Positions in the tuning blocks
 # These are both for the x direction
