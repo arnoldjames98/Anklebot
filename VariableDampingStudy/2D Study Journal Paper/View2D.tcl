@@ -21,8 +21,8 @@ set neutralTimeRange [list 1500 4000]
 #set neutralTimeRange [list 500 1000]
 
 # Radii of the cursor and target in degrees
-set cursorRadius 1
-set targetRadius 2
+set cursorRadius 0.75
+set targetRadius 2.25
 
 # --------------Initialized Variables-----------------
 
