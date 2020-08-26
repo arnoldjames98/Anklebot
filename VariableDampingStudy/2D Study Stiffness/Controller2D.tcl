@@ -729,6 +729,21 @@ proc applyDamping {damping_IE damping_DP} {
   }
 }
 
+proc applyVariableStiffness {} {
+  global targetOrientation
+  if {$targetOrientation == "2D"} {
+    # Everything that needs to written to shared memory
+    wshm ankle_stiff_DP 0.0
+    wshm ankle_stiff_IE 0.0
+    wshm ankle_stiff_k12 0.0
+    wshm ankle_stiff_k21 0.0
+    # Where the stiffness equilibrium should be placed (UNITS?)
+    wshm ankle_dp_stiff_center 0.0
+    wshm ankle_ie_stiff_center 0.0
+    puts "Variable Stiffness applied"
+  }
+}
+
 # End of trials
 proc endTrials {} {
   global selectedK_pos_IE
