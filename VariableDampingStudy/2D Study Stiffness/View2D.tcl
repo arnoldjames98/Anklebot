@@ -1,4 +1,4 @@
-## View.tcl
+## View2D.tcl
 # Created by James Arnold
 
 package require Tk
@@ -12,12 +12,17 @@ source Controller2D.tcl
 
 # Time required to meet targets, in ms
 set targetTime 2000
+# Uncomment this line for testing the study quickly
+#set targetTime 500
+
 # No time randomization in this study, but still used for tuning trials
 set neutralTimeRange [list 1500 4000]
+ # Uncomment this line for testing the study quickly
+#set neutralTimeRange [list 500 1000]
 
 # Radii of the cursor and target in degrees
-set cursorRadius 1
-set targetRadius 1.5
+set cursorRadius 0.75
+set targetRadius 2.25
 
 # --------------Initialized Variables-----------------
 
@@ -210,62 +215,90 @@ proc buttonAction {place} {
   }
 }
 
+# Predefined paths for 2D data collection trials
+# These paths are designed so that the +/- x-direction total distance both equal 30.5 degrees
+# and the +/- y-direction total distance both equal 61.0 degrees and fit inside and elliptical workspace
+
+# Path 1
+set path1_X [list 0.0 3.9 -2.4 2.4 -6.7 4.2 0.1 5.3 -0.8 -5.7 -1.6 0.0]
+set path1_Y [list 0.0 -7.5 13.8 5.8 -2.2 -9.4 -0.6 7.2 -3.1 5.9 -14.1 0.0]
+
+# Path 2          
+set path2_X [list 0.0 -3.9 2.4 -2.4 6.7 -4.2 -0.1 -5.3 0.8 5.7 1.6 0.0]
+set path2_Y [list 0.0 -7.5 13.8 5.8 -2.2 -9.4 -0.6 7.2 -3.1 5.9 -14.1 0.0]
+
+# Path 3      
+set path3_X [list 0.0 3.9 -2.4 2.4 -6.7 4.2 0.1 5.3 -0.8 -5.7 -1.6 0.0]
+set path3_Y [list 0.0 7.5 -13.8 -5.8 2.2 9.4 0.6 -7.2 3.1 -5.9 14.1 0.0]
+
+# Path 4     
+set path4_X [list 0.0 -3.9 2.4 -2.4 6.7 -4.2 -0.1 -5.3 0.8 5.7 1.6 0.0]
+set path4_Y [list 0.0 7.5 -13.8 -5.8 2.2 9.4 0.6 -7.2 3.1 -5.9 14.1 0.0]
+
 # Target Positions in the tuning blocks
 # These are both for the x direction
-set targetPositionsInBlock1_IE [list 0.000 2.908 0.000 -6.122 0.000 -2.903 0.000 5.172 0.000 -7.490 0.000 6.866 0.000 -5.535 0.000 4.507 0.000 -5.440 0.000 4.283 0.000]
-set targetPositionsInBlock2_IE [list 0.000 -5.939 0.000 5.330 0.000 3.508 0.000 -5.096 0.000 -4.852 0.000 2.801 0.000 7.195 0.000 -2.609 0.000 5.918 0.000 -2.840 0.000]
+set targetPositionsInBlock1_IE [list 0.000 7.5 0.000 -7.5 0.000 -7.5 0.000 7.5 0.000 -7.5 0.000 7.5 0.000 -7.5 0.000 7.5 0.000 -7.5 0.000 7.5 0.000]
+set targetPositionsInBlock2_IE [list 0.000 -7.5 0.000 7.5 0.000 7.5 0.000 -7.5 0.000 -7.5 0.000 7.5 0.000 7.5 0.000 -7.5 0.000 7.5 0.000 -7.5 0.000]
+set targetPositionsInBlock3_IE [list 0.000 -7.5 0.000 7.5 0.000 -7.5 0.000 -7.5 0.000 -7.5 0.000 7.5 0.000 7.5 0.000 7.5 0.000 7.5 0.000 -7.5 0.000]
 # These are both for the y direction
-set targetPositionsInBlock3_DP [list 0.000 7.013 0.000 -10.296 0.000 -5.578 0.000 -7.589 0.000 6.240 0.000 -14.088 0.000 6.001 0.000 5.397 0.000 -10.520 0.000 12.875 0.000]
-set targetPositionsInBlock4_DP [list 0.000 6.076 0.000 -8.349 0.000 7.239 0.000 10.420 0.000 -10.900 0.000 -14.830 0.000 7.944 0.000 -13.296 0.000 -7.408 0.000 7.746 0.000]
+set targetPositionsInBlock4_DP [list 0.000 15.0 0.000 -15.0 0.000 -15.0 0.000 -15.0 0.000 15.0 0.000 -15.0 0.000 15.0 0.000 15.0 0.000 -15.0 0.000 15.0 0.000]
+set targetPositionsInBlock5_DP [list 0.000 15.0 0.000 -15.0 0.000 15.0 0.000 15.0 0.000 -15.0 0.000 -15.0 0.000 15.0 0.000 -15.0 0.000 -15.0 0.000 15.0 0.000]
+set targetPositionsInBlock6_DP [list 0.000 -15.0 0.000 15.0 0.000 15.0 0.000 -15.0 0.000 15.0 0.000 -15.0 0.000 15.0 0.000 15.0 0.000 -15.0 0.000 -15.0 0.000]
 
-# The rest are pairs of x and y vectors cooresponding to the following 15 blocks
-# First set of 5 pairs
-set targetPositionsInBlock5_X [list 0.000 6.953 2.507 -7.211 2.270 -4.031 5.762 -6.789 -2.364 4.420 -6.678 0.000]
-set targetPositionsInBlock5_Y [list 0.000 -13.731 2.593 -4.169 14.244 -2.895 -12.172 -3.029 7.079 1.347 11.809 0.000]
+# The rest are pairs of x and y vectors cooresponding to the following 3 blocks
+# Practice set of 3 pairs (only 10 trials, completely random target placement)
+set targetPositionsInBlock7_X $path3_X
+set targetPositionsInBlock7_Y $path3_Y
 
-set targetPositionsInBlock6_X [list 0.000 2.504 6.506 -0.232 7.077 -0.679 -3.800 5.743 1.483 5.996 -4.415 0.000]
-set targetPositionsInBlock6_Y [list 0.000 -12.838 9.329 -2.489 14.639 -3.333 8.533 1.749 -10.534 -1.488 11.990 0.000]
+set targetPositionsInBlock8_X $path4_X
+set targetPositionsInBlock8_Y $path4_Y
 
-set targetPositionsInBlock7_X [list 0.000 -3.807 3.335 -6.593 -2.637 -7.325 1.967 5.390 1.063 -6.434 5.816 0.000]
-set targetPositionsInBlock7_Y [list 0.000 13.527 -2.998 -10.970 -5.948 1.197 -10.605 14.227 1.606 -5.080 -13.061 0.000]
+# The rest are pairs of x and y vectors cooresponding to the following blocks for data collection
+set targetPositionsInBlock9_X $path1_X
+set targetPositionsInBlock9_Y $path1_Y
 
-set targetPositionsInBlock8_X [list 0.000 2.906 -5.860 -1.651 -6.745 5.013 0.003 2.567 -6.660 -0.972 1.761 0.000]
-set targetPositionsInBlock8_Y [list 0.000 13.356 6.167 -1.219 -8.139 -14.531 -8.460 2.988 -13.310 9.967 0.604 0.000]
+set targetPositionsInBlock10_X $path2_X
+set targetPositionsInBlock10_Y $path2_Y
 
-set targetPositionsInBlock9_X [list 0.000 -7.002 -2.671 -6.769 0.791 -3.877 6.535 -4.863 2.994 -0.914 3.923 0.000]
-set targetPositionsInBlock9_Y [list 0.000 6.495 -4.904 1.457 -6.756 13.692 6.848 -4.189 -14.964 1.292 7.872 0.000]
+set targetPositionsInBlock11_X $path3_X
+set targetPositionsInBlock11_Y $path3_Y
 
-# Next set of 5 pairs
-set targetPositionsInBlock10_X [list 0.000 -6.118 2.584 -7.354 0.484 6.097 -7.127 5.058 -6.646 1.237 -1.892 0.000]
-set targetPositionsInBlock10_Y [list 0.000 -11.303 -2.055 -7.296 13.387 -3.219 5.143 14.145 -1.490 5.599 -11.516 0.000]
 
-set targetPositionsInBlock11_X [list 0.000 6.860 -6.145 6.166 1.141 -1.442 -6.150 0.171 3.385 0.440 5.381 0.000]
-set targetPositionsInBlock11_Y [list 0.000 -9.822 10.757 -8.103 9.319 14.653 -5.372 -13.182 1.697 9.899 -5.465 0.000]
+set targetPositionsInBlock12_X $path1_X
+set targetPositionsInBlock12_Y $path1_Y
 
-set targetPositionsInBlock12_X [list 0.000 3.524 0.642 -2.833 -7.360 2.141 -7.044 -0.676 3.406 -0.952 -6.756 0.000]
-set targetPositionsInBlock12_Y [list 0.000 13.623 1.203 -12.863 12.451 -14.957 -8.746 -14.741 -4.377 -13.524 2.821 0.000]
+set targetPositionsInBlock13_X $path2_X
+set targetPositionsInBlock13_Y $path2_Y
 
-set targetPositionsInBlock13_X [list 0.000 4.785 -0.036 3.827 -0.640 5.026 1.241 5.324 -6.954 3.692 -5.341 0.000]
-set targetPositionsInBlock13_Y [list 0.000 7.157 -12.983 7.272 -10.305 12.966 2.476 -13.954 -2.768 -10.355 3.179 0.000]
+set targetPositionsInBlock14_X $path3_X
+set targetPositionsInBlock14_Y $path3_Y
 
-set targetPositionsInBlock14_X [list 0.000 4.221 -5.556 6.412 1.390 -4.987 7.490 -4.295 6.542 2.748 -0.930 0.000]
-set targetPositionsInBlock14_Y [list 0.000 7.346 -7.722 -13.461 10.152 0.066 -13.588 -3.065 -8.112 13.863 -14.825 0.000]
 
-# Final set of 5 pairs
-set targetPositionsInBlock15_X [list 0.000 -4.005 3.949 -4.148 4.949 -3.143 5.431 2.638 -3.766 4.508 -2.182 0.000]
-set targetPositionsInBlock15_Y [list 0.000 12.974 2.204 -5.129 2.536 -2.923 3.442 -8.889 -0.726 -11.848 10.233 0.000]
+set targetPositionsInBlock15_X $path1_X
+set targetPositionsInBlock15_Y $path1_Y
 
-set targetPositionsInBlock16_X [list 0.000 -5.873 1.771 6.929 2.438 -3.602 0.603 -6.615 5.851 -4.054 2.280 0.000]
-set targetPositionsInBlock16_Y [list 0.000 -13.917 2.014 7.383 0.699 13.860 -14.092 0.591 -5.094 -11.582 -6.545 0.000]
+set targetPositionsInBlock16_X $path2_X
+set targetPositionsInBlock16_Y $path2_Y
 
-set targetPositionsInBlock17_X [list 0.000 3.839 -5.791 5.229 -0.507 -6.969 -1.384 4.581 -6.717 -4.205 6.878 0.000]
-set targetPositionsInBlock17_Y [list 0.000 8.498 14.357 -13.481 -5.230 0.414 -11.759 -1.474 11.167 -1.211 8.701 0.000]
+set targetPositionsInBlock17_X $path3_X
+set targetPositionsInBlock17_Y $path3_Y
 
-set targetPositionsInBlock18_X [list 0.000 7.095 -5.686 5.962 -0.005 -7.060 4.907 1.222 -6.783 1.479 -5.790 0.000]
-set targetPositionsInBlock18_Y [list 0.000 -5.726 12.473 -5.036 3.459 -14.038 -4.800 13.130 -13.381 5.444 -12.894 0.000]
+set targetPositionsInBlock18_X $path4_X
+set targetPositionsInBlock18_Y $path4_Y
 
-set targetPositionsInBlock19_X [list 0.000 6.575 0.497 -3.484 6.415 -3.009 4.476 -3.999 5.068 -0.027 7.113 0.000]
-set targetPositionsInBlock19_Y [list 0.000 -7.337 13.643 -7.497 -12.943 2.748 8.879 3.025 12.624 -6.672 12.519 0.000]
+
+set targetPositionsInBlock19_X $path1_X
+set targetPositionsInBlock19_Y $path1_Y
+
+set targetPositionsInBlock20_X $path2_X
+set targetPositionsInBlock20_Y $path2_Y
+
+set targetPositionsInBlock21_X $path3_X
+set targetPositionsInBlock21_Y $path3_Y
+
+set targetPositionsInBlock22_X $path4_X
+set targetPositionsInBlock22_Y $path4_Y
+
 
 # Initialize the targets for the first block
 set targetPositionsInBlock $targetPositionsInBlock1_IE
@@ -326,7 +359,13 @@ set center [.right.view create oval [drawCircle 0 0 0.1 ] -fill $gridColor -outl
 
 # Load the file that allows for the creation of a graph in tcl (used for calculation of k)
 source /home/imt/imt/robot4/protocols/ankle/VariableDampingStudy/Supporting/Graph.tcl
-emu_graph::emu_graph foo -canvas .right.view -width 600 -height 300 -xref 200 -yref 600
+#emu_graph::emu_graph foo -canvas .right.view -width 600 -height 300 -xref 200 -yref 600
+
+# Uncomment this line to view the plot
+# emu_graph::emu_graph responseGraph -canvas .right.view -width 600 -height 300 -xref 200 -yref 600
+
+# Intentionally put the plot off of the page so the subject can't see it (comment this out to view plot)
+emu_graph::emu_graph responseGraph -canvas .right.view -width 600 -height 300 -xref 20000 -yref 60000
 
 
 # ----------------------Loops----------------------
@@ -382,6 +421,7 @@ every 10 {
   global blocks
   global currentTrial
   global totalTrials
+  global pathLine
   
   global innerCursor_DP
   global outerCursor_DP
@@ -417,6 +457,9 @@ every 10 {
       if {[ expr $currentTarget_X - $targetRadius ] <= $innerCursor_IE && [ expr $currentTarget_X + $targetRadius ] >= $outerCursor_IE && [ expr $currentTarget_Y - $targetRadius ] <= $innerCursor_DP && [ expr $currentTarget_Y + $targetRadius ] >= $outerCursor_DP } {
         # Visual feedback that user is inside of target
         .right.view itemconfigure $::target -fill $insideTargetColor
+
+        # Delete the previous pathLine when the target is hit
+        .right.view delete pathLine
         
         # Start counting how long the user is in the the target in ms
         set timeInsideTarget [expr $timeInsideTarget + 10]
@@ -441,11 +484,15 @@ every 10 {
           #set currentTarget [lindex $targetPositionsInBlock 0 $i]
           set currentTarget_X [lindex $targetPositionsInBlock_X $i]
           set currentTarget_Y [lindex $targetPositionsInBlock_Y $i]
+
+          # Previous target (used to draw straight line between the previous and current targets)
+          set previousTarget_X [lindex $targetPositionsInBlock_X [expr $i - 1]]
+          set previousTarget_Y [lindex $targetPositionsInBlock_Y [expr $i - 1]]
           
           # What happens after a target at a distance is met and new neutral target just appeared
           if {$currentTarget_X == 0 && $currentTarget_Y == 0} {
             # For 2D case, always send a 1 to signify target was shown in log
-            sendTargetDistanceSignal 1
+            sendTargetDistanceSignal $currentTarget_X $currentTarget_Y
             
             # Neutral target, random time range to be met (How long is needed to stay inside the target to meet the target)
             set requiredTimeInsideTarget [randomInRange $neutralTimeRange]
@@ -462,6 +509,9 @@ every 10 {
               
               # Delete text that says "Go!"
               .right.view delete goText
+
+              # Delete the previous pathLine
+              .right.view delete pathLine
             }
             # What happens when a neutral target is met and a target at a distance has just appeared
           } else {
@@ -475,7 +525,7 @@ every 10 {
             }
             
             # Sends a signal to the controller that shows the distance of the target (just send a 1 for 2D)
-            sendTargetDistanceSignal 1
+            sendTargetDistanceSignal $currentTarget_X $currentTarget_Y
             
             # Play an audio file at the start of each trial, using a bash script
             exec bash /home/imt/imt/robot4/protocols/ankle/VariableDampingStudy/Supporting/playSound.sh &
@@ -490,6 +540,9 @@ every 10 {
               
               # Delete text that says "Go!"
               .right.view delete goText
+
+              # Delete the previous pathLine
+              .right.view delete pathLine
             }
             
             # Show text that says "Go!" next to or above the target, depending on whether the trial is DP or IE
@@ -503,9 +556,15 @@ every 10 {
             }
           }
           
+
           # Draw the new target
           .right.view coords $::target [drawCircle $currentTarget_X $currentTarget_Y $targetRadius ]
-          
+
+          # Draw a line to the target
+          if {$i > 0} {
+            .right.view create line [drawLine $previousTarget_X $previousTarget_Y $currentTarget_X $currentTarget_Y] -fill $targetColor -tags pathLine -width 3 -dash -
+          }
+
           # Places the target on the correct coordinate axis for DP vs IE studies
           if {$targetOrientation == "DP"} {
             .right.view coords $::target [drawCircle 0 $currentTarget $targetRadius ]
@@ -592,7 +651,11 @@ every 10 {
           if {$currentTarget == 0} {
             
             # Sends a signal to the controller that shows the distance of the target, will be 0 in this case
-            sendTargetDistanceSignal $currentTarget
+            if {$targetOrientation == "DP"} {
+            	sendTargetDistanceSignal 0 $currentTarget
+            } elseif {$targetOrientation == "IE"} {
+            	sendTargetDistanceSignal $currentTarget 0
+            }
             
             # Neutral target, random time range to be met (How long is needed to stay inside the target to meet the target)
             set requiredTimeInsideTarget [randomInRange $neutralTimeRange]
@@ -617,7 +680,11 @@ every 10 {
             set currentTrial [expr $currentTrial + 1]
             
             # Sends a signal to the controller that shows the distance of the target
-            sendTargetDistanceSignal $currentTarget
+            if {$targetOrientation == "DP"} {
+            	sendTargetDistanceSignal 0 $currentTarget
+            } elseif {$targetOrientation == "IE"} {
+            	sendTargetDistanceSignal $currentTarget 0
+            }
             
             # Play an audio file at the start of each trial, using a bash script
             exec bash /home/imt/imt/robot4/protocols/ankle/VariableDampingStudy/Supporting/playSound.sh &
