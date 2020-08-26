@@ -177,7 +177,7 @@ set ob(nlog) 25
 
 # Specifies the controller being used
 set ob(ankle_pt_ctl) 15
-set ob(ankle_ctl_independent) 30
+set ob(ankle_stiff_ctl) 30
 
 # Calibrate the robot
 puts "Loading robot kernel module..."
@@ -235,7 +235,7 @@ set x [rshm ankle_ie_pos]
 set y [rshm ankle_dp_pos]
 
 # Without the following line, none of the stiffness values are set
-movebox 0 $ob(ankle_ctl_independent) {0 $Hz 1} {$x $y 0 0} {0 0 0 0}
+movebox 0 $ob(ankle_stiff_ctl) {0 $Hz 1} {$x $y 0 0} {0 0 0 0}
 after 100
 
 # -------------------Other Functions------------------------
@@ -763,7 +763,7 @@ proc neutralReturn {} {
   set y [rshm ankle_dp_pos]
   
   # Move the ankle to the neutral position
-  movebox 0 $ob(ankle_ctl_independent) {0 $Hz 1} {$x $y 0 0} {0 0 0 0}
+  movebox 0 $ob(ankle_stiff_ctl) {0 $Hz 1} {$x $y 0 0} {0 0 0 0}
   puts "Start move"
   after 1000
   puts "Complete"
