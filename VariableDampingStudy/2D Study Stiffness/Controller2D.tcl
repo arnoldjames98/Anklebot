@@ -216,6 +216,10 @@ wshm damp 0.0
 # Set the stiffness and damping in preparation for gravity compensation
 wshm ankle_stiff_DP 200
 wshm ankle_stiff_IE 400.0
+wshm ankle_stiff_k12 0.0
+wshm ankle_stiff_k21 0.0
+wshm ankle_dp_stiff_center 0.0
+wshm ankle_ie_stiff_center 0.0
 wshm ankle_damp_DP 0.0
 wshm ankle_damp_IE 1.0
 
@@ -270,14 +274,26 @@ proc applyStiffness {} {
   if {$targetOrientation == "DP"} {
     wshm ankle_stiff_DP 0.0
     wshm ankle_stiff_IE 200.0
+    wshm ankle_stiff_k12 0.0
+    wshm ankle_stiff_k21 0.0
+    wshm ankle_dp_stiff_center 0.0
+    wshm ankle_ie_stiff_center 0.0
     puts "Stiffness applied"
   } elseif {$targetOrientation == "IE"} {
     wshm ankle_stiff_DP 400.0
     wshm ankle_stiff_IE 0.0
+    wshm ankle_stiff_k12 0.0
+    wshm ankle_stiff_k21 0.0
+    wshm ankle_dp_stiff_center 0.0
+    wshm ankle_ie_stiff_center 0.0
     puts "Stiffness applied"
   } elseif {$targetOrientation == "2D"} {
     wshm ankle_stiff_DP 0.0
     wshm ankle_stiff_IE 0.0
+    wshm ankle_stiff_k12 0.0
+    wshm ankle_stiff_k21 0.0
+    wshm ankle_dp_stiff_center 0.0
+    wshm ankle_ie_stiff_center 0.0
     puts "2D Stiffness applied"
   }
 }
@@ -395,11 +411,23 @@ proc endBlock {currentBlock} {
     # Prevent the subject from moving from the neutral position during the break
     if {$targetOrientation == "DP"} {
       wshm ankle_stiff_DP 200.0
+      wshm ankle_stiff_k12 0.0
+      wshm ankle_stiff_k21 0.0
+      wshm ankle_dp_stiff_center 0.0
+      wshm ankle_ie_stiff_center 0.0
     } elseif {$targetOrientation == "IE"} {
       wshm ankle_stiff_IE 200.0
+      wshm ankle_stiff_k12 0.0
+      wshm ankle_stiff_k21 0.0
+      wshm ankle_dp_stiff_center 0.0
+      wshm ankle_ie_stiff_center 0.0
     } elseif {$targetOrientation == "2D"} {
       wshm ankle_stiff_DP 200.0
       wshm ankle_stiff_IE 200.0
+      wshm ankle_stiff_k12 0.0
+      wshm ankle_stiff_k21 0.0
+      wshm ankle_dp_stiff_center 0.0
+      wshm ankle_ie_stiff_center 0.0
     }
     
     # Pause the study until enter is pressed
@@ -765,7 +793,6 @@ proc applyVariableStiffness {} {
     set projx_rad [ expr  $projx*($pi / 180) ]
     set projy_rad [ expr  $projy*($pi / 180) ]
 
-
     # Calculate the rotation angle
     set xdist [ expr $currentTarget_X - $previousTarget_X ]
     set ydist [ expr $currentTarget_Y - $previousTarget_Y ]
@@ -774,20 +801,14 @@ proc applyVariableStiffness {} {
     set angle [ expr atan2($ydist, $xdist) ]
 
     # Everything that needs to written to shared memory
-    
-    # Input to function
     wshm ankle_stiff_DP [ expr overallStiffness * cos(angle)]
-    
     wshm ankle_stiff_IE 0.0
-
-    # Input to function
     wshm ankle_stiff_k12 [ expr -overallStiffness * cos(angle) ]
-
     wshm ankle_stiff_k21 0.0
-
     # Where the stiffness equilibrium should be placed (UNITS? most likely in radians)
     wshm ankle_dp_stiff_center $projy_rad
     wshm ankle_ie_stiff_center $projx_rad
+
     puts "Variable Stiffness applied"
   }
 }
@@ -809,6 +830,10 @@ proc endTrials {} {
   puts "End of trials"
   wshm ankle_stiff_DP 50.0
   wshm ankle_stiff_IE 50.0
+  wshm ankle_stiff_k12 0.0
+  wshm ankle_stiff_k21 0.0
+  wshm ankle_dp_stiff_center 0.0
+  wshm ankle_ie_stiff_center 0.0
   wshm ankle_damp_DP 5.0
   wshm ankle_damp_IE 5.0
   puts "Press ENTER to exit"
