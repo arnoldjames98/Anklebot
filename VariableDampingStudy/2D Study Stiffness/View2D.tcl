@@ -411,6 +411,9 @@ every 10 {
   global currentTarget
   global currentTarget_X
   global currentTarget_Y
+  global previousTarget_X
+  global previousTarget_Y
+
   global target
   global i
   global targetOrientation
