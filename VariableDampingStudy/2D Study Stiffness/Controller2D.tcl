@@ -761,7 +761,6 @@ proc applyDamping {damping_IE damping_DP} {
 }
 
 proc applyVariableStiffness {} {
-  global targetOrientation
   global currentTarget_X
   global currentTarget_Y
   global previousTarget_X
@@ -769,48 +768,46 @@ proc applyVariableStiffness {} {
   global pi
   global overallStiffness
 
-  if {$targetOrientation == "2D"} {
+  # Find the position coordinates of the robot in degrees
+  set coordinates [getRobotPosition .right.view]
+  lassign $coordinates x y
 
-    # Find the position coordinates of the robot in degrees
-    set coordinates [getRobotPosition .right.view]
-    lassign $coordinates x y
+  # A vector
+  set a1 [ expr -$x*($currentTarget_X-$previousTarget_X) - $y*($currentTarget_Y-$previousTarget_Y) ]
+  set a2 [ expr -$previousTarget_Y*($currentTarget_X-$previousTarget_X) + $previousTarget_X*($currentTarget_Y-$previousTarget_Y) ]
 
-    # A vector
-    set a1 [ expr -$x*($currentTarget_X-$previousTarget_X) - $y*($currentTarget_Y-$previousTarget_Y) ]
-    set a2 [ expr -$previousTarget_Y*($currentTarget_X-$previousTarget_X) + $previousTarget_X*($currentTarget_Y-$previousTarget_Y) ]
+  # B matrix
+  set b11 [ expr $currentTarget_X - $previousTarget_X ]
+  set b12 [ expr $currentTarget_Y - $previousTarget_Y ]
+  set b21 [ expr $previousTarget_Y - $currentTarget_Y ]
+  set b22 [ expr $currentTarget_X - $previousTarget_X ]
 
-    # B matrix
-    set b11 [ expr $currentTarget_X - $previousTarget_X ]
-    set b12 [ expr $currentTarget_Y - $previousTarget_Y ]
-    set b21 [ expr $previousTarget_Y - $currentTarget_Y ]
-    set b22 [ expr $currentTarget_X - $previousTarget_X ]
+  # Calculate projection
+  set projx [ expr  -((($a1*$b22)/($b11*$b22-$b12*$b21))-(($a2*$b12)/($b11*$b22-$b12*$b21))) ]
+  set projy [ expr  -((($a2*$b11)/($b11*$b22-$b12*$b21))-(($a1*$b21)/($b11*$b22-$b12*$b21))) ]
 
-    # Calculate projection
-    set projx [ expr  -((($a1*$b22)/($b11*$b22-$b12*$b21))-(($a2*$b12)/($b11*$b22-$b12*$b21))) ]
-    set projy [ expr  -((($a2*$b11)/($b11*$b22-$b12*$b21))-(($a1*$b21)/($b11*$b22-$b12*$b21))) ]
+  # Convert degrees to radians
+  set projx_rad [ expr  $projx*($pi / 180) ]
+  set projy_rad [ expr  $projy*($pi / 180) ]
 
-    # Convert degrees to radians
-    set projx_rad [ expr  $projx*($pi / 180) ]
-    set projy_rad [ expr  $projy*($pi / 180) ]
+  # Calculate the rotation angle
+  set xdist [ expr $currentTarget_X - $previousTarget_X ]
+  set ydist [ expr $currentTarget_Y - $previousTarget_Y ]
 
-    # Calculate the rotation angle
-    set xdist [ expr $currentTarget_X - $previousTarget_X ]
-    set ydist [ expr $currentTarget_Y - $previousTarget_Y ]
+  # Calculate the angle of rotation of stiffness ellipse
+  set angle [ expr atan2($ydist, $xdist) ]
 
-    # Calculate the angle of rotation of stiffness ellipse
-    set angle [ expr atan2($ydist, $xdist) ]
+  # Everything that needs to written to shared memory
+  wshm ankle_stiff_DP [ expr overallStiffness * cos(angle)]
+  wshm ankle_stiff_IE 0.0
+  wshm ankle_stiff_k12 [ expr -overallStiffness * cos(angle) ]
+  wshm ankle_stiff_k21 0.0
+  # Where the stiffness equilibrium should be placed (UNITS? most likely in radians)
+  wshm ankle_dp_stiff_center $projy_rad
+  wshm ankle_ie_stiff_center $projx_rad
 
-    # Everything that needs to written to shared memory
-    wshm ankle_stiff_DP [ expr overallStiffness * cos(angle)]
-    wshm ankle_stiff_IE 0.0
-    wshm ankle_stiff_k12 [ expr -overallStiffness * cos(angle) ]
-    wshm ankle_stiff_k21 0.0
-    # Where the stiffness equilibrium should be placed (UNITS? most likely in radians)
-    wshm ankle_dp_stiff_center $projy_rad
-    wshm ankle_ie_stiff_center $projx_rad
+  puts "Variable Stiffness applied"
 
-    puts "Variable Stiffness applied"
-  }
 }
 
 # End of trials
@@ -901,6 +898,10 @@ every 10 {
   global selectedK_pos_DP
   global selectedK_neg_DP
   global currentTarget
+
+  if {$targetOrientation = "2D"} {
+    applyVariableStiffness
+  }
   
   # When k is being calculated OR variable damping (1D or 2D) is enabled, need to find vel and accel
   if {$calculatingK == 1 || $enablingVariableDamping == 1 || $enablingVariableDamping == 2} {
@@ -1056,5 +1057,6 @@ every 10 {
     
     # Now that the correct IE, DP, +, and - damping has been found for this time step, set the damping
     applyDamping $damping_IE $damping_DP
+
   }
 }
