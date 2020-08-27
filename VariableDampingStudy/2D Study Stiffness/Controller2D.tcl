@@ -768,45 +768,87 @@ proc applyVariableStiffness {} {
   global pi
   global overallStiffness
 
-  # Find the position coordinates of the robot in degrees
-  set coordinates [getRobotPosition .right.view]
-  lassign $coordinates x y
+  puts $currentTarget_X
+  puts $currentTarget_Y
+  puts $previousTarget_X
+  puts $previousTarget_Y
 
-  # A vector
-  set a1 [ expr -$x*($currentTarget_X-$previousTarget_X) - $y*($currentTarget_Y-$previousTarget_Y) ]
-  set a2 [ expr -$previousTarget_Y*($currentTarget_X-$previousTarget_X) + $previousTarget_X*($currentTarget_Y-$previousTarget_Y) ]
+  if {($currentTarget_X == 0.0 && $currentTarget_Y == 0.0 && $previousTarget_X == 0.0 && $previousTarget_Y == 0.0) || ($currentTarget_X == 0.0 && $currentTarget_Y == 0.0 && $previousTarget_X == "" && $previousTarget_Y == "")} {
+    puts "Variable Stiffness NOT applied"
 
-  # B matrix
-  set b11 [ expr $currentTarget_X - $previousTarget_X ]
-  set b12 [ expr $currentTarget_Y - $previousTarget_Y ]
-  set b21 [ expr $previousTarget_Y - $currentTarget_Y ]
-  set b22 [ expr $currentTarget_X - $previousTarget_X ]
+  } else {
 
-  # Calculate projection
-  set projx [ expr  -((($a1*$b22)/($b11*$b22-$b12*$b21))-(($a2*$b12)/($b11*$b22-$b12*$b21))) ]
-  set projy [ expr  -((($a2*$b11)/($b11*$b22-$b12*$b21))-(($a1*$b21)/($b11*$b22-$b12*$b21))) ]
+    # Find the position coordinates of the robot in degrees
+    set coordinates [getRobotPosition .right.view]
+    lassign $coordinates x y
 
-  # Convert degrees to radians
-  set projx_rad [ expr  $projx*($pi / 180) ]
-  set projy_rad [ expr  $projy*($pi / 180) ]
+    # Projection point
+    puts "Current Poisition:"
+    puts $x
+    puts $y
 
-  # Calculate the rotation angle
-  set xdist [ expr $currentTarget_X - $previousTarget_X ]
-  set ydist [ expr $currentTarget_Y - $previousTarget_Y ]
+    # A vector
+    set a1 [ expr -$x*($currentTarget_X-$previousTarget_X) - $y*($currentTarget_Y-$previousTarget_Y) ]
+    set a2 [ expr -$previousTarget_Y*($currentTarget_X-$previousTarget_X) + $previousTarget_X*($currentTarget_Y-$previousTarget_Y) ]
 
-  # Calculate the angle of rotation of stiffness ellipse
-  set angle [ expr atan2($ydist, $xdist) ]
+    # B matrix
+    set b11 [ expr $currentTarget_X - $previousTarget_X ]
+    set b12 [ expr $currentTarget_Y - $previousTarget_Y ]
+    set b21 [ expr $previousTarget_Y - $currentTarget_Y ]
+    set b22 [ expr $currentTarget_X - $previousTarget_X ]
 
-  # Everything that needs to written to shared memory
-  wshm ankle_stiff_DP [ expr overallStiffness * cos(angle)]
-  wshm ankle_stiff_IE 0.0
-  wshm ankle_stiff_k12 [ expr -overallStiffness * cos(angle) ]
-  wshm ankle_stiff_k21 0.0
-  # Where the stiffness equilibrium should be placed (UNITS? most likely in radians)
-  wshm ankle_dp_stiff_center $projy_rad
-  wshm ankle_ie_stiff_center $projx_rad
+    # Calculate projection
+    set projx [ expr  -((($a1*$b22)/($b11*$b22-$b12*$b21))-(($a2*$b12)/($b11*$b22-$b12*$b21))) ]
+    set projy [ expr  -((($a2*$b11)/($b11*$b22-$b12*$b21))-(($a1*$b21)/($b11*$b22-$b12*$b21))) ]
 
-  puts "Variable Stiffness applied"
+    # Projection point
+    puts "Projection point:"
+    puts $projx
+    puts $projy 
+
+    # Convert degrees to radians
+    set projx_rad [ expr  $projx * ( $pi / 180) ]
+    set projy_rad [ expr  $projy * ( $pi / 180) ]
+
+    # Calculate the rotation angle
+    set xdist [ expr $currentTarget_X - $previousTarget_X ]
+    set ydist [ expr $currentTarget_Y - $previousTarget_Y ]
+
+    # Calculate the angle of rotation of stiffness ellipse
+    set angle [ expr atan2($ydist, $xdist) ]
+    puts "Angle:"
+    puts $angle
+
+    # Everything that needs to written to shared memory
+    wshm ankle_stiff_DP [ expr $overallStiffness * sin($angle)]
+    wshm ankle_stiff_IE 0.0
+    wshm ankle_stiff_k12 [ expr -1 * $overallStiffness * sin($angle) ]
+    wshm ankle_stiff_k21 0.0
+    # Where the stiffness equilibrium should be placed (UNITS? most likely in radians)
+    wshm ankle_dp_stiff_center $projy_rad
+    wshm ankle_ie_stiff_center $projx_rad
+
+    # Check these in the shm to see what the issue is
+    set xSHM [rshm ankle_ie_pos]
+    set ySHM [rshm ankle_dp_pos]
+    puts "ankle_ie_pos and ankle_dp_pos"
+    puts $xSHM
+    puts $ySHM
+
+    set xref_posSHM [rshm ankle_ie_ref_pos]
+    set yref_posSHM [rshm ankle_dp_ref_pos]
+    puts "ankle_ie_ref_pos and ankle_dp_ref_pos"
+    puts $xref_posSHM
+    puts $yref_posSHM
+
+    set xstiff_centerSHM [rshm ankle_ie_stiff_center]
+    set ystiff_centerSHM [rshm ankle_dp_stiff_center]
+    puts "ankle_ie_stiff_center and ankle_dp_stiff_center"
+    puts $xstiff_centerSHM
+    puts $ystiff_centerSHM
+
+    puts "Variable Stiffness applied"
+  }
 
 }
 
@@ -899,7 +941,7 @@ every 10 {
   global selectedK_neg_DP
   global currentTarget
 
-  if {$targetOrientation = "2D"} {
+  if {$targetOrientation == "2D"} {
     applyVariableStiffness
   }
   
