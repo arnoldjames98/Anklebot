@@ -44,7 +44,7 @@ set positiveDamping_DP 3
 set variableDampingRange_DP [list $negativeDamping_DP $positiveDamping_DP]
 
 # Stiffness values
-set overallStiffness 10
+set overallStiffness 50
 
 # Initialized list of every damping enviorment in order
 set everyBlockEnvironment {}
@@ -820,7 +820,7 @@ proc applyVariableStiffness {} {
     puts $angle
 
     # Everything that needs to written to shared memory
-    wshm ankle_stiff_DP [ expr $overallStiffness * sin($angle)]
+    wshm ankle_stiff_DP [ expr $overallStiffness * cos($angle)]
     wshm ankle_stiff_IE 0.0
     wshm ankle_stiff_k12 [ expr -1 * $overallStiffness * sin($angle) ]
     wshm ankle_stiff_k21 0.0
@@ -847,7 +847,31 @@ proc applyVariableStiffness {} {
     puts $xstiff_centerSHM
     puts $ystiff_centerSHM
 
+
+    set xankle_torqueSHM [rshm ankle_ie_torque]
+    set yankle_torqueSHM [rshm ankle_dp_torque]
+    puts "ankle_ie_torque and ankle_dp_torque"
+    puts $xankle_torqueSHM
+    puts $yankle_torqueSHM
+
+    # Recreate the control that's in the C code
+    set pos_equil_DP [ expr  $ySHM - $ystiff_centerSHM - $yref_posSHM ]
+    set pos_equil_IE [ expr  $xSHM - $xstiff_centerSHM - $xref_posSHM ]
+
+    set kIE [rshm ankle_stiff_IE]
+    set k12 [rshm ankle_stiff_k12]
+    set k21 [rshm ankle_stiff_k21]
+    set kDP [rshm ankle_stiff_DP]
+
+    set TDP [ expr -1 * (($kDP * $pos_equil_DP) + ($k21 * $pos_equil_IE))  ]
+    set TIE [ expr -1 * (($kIE * $pos_equil_IE) + ($k12 * $pos_equil_DP))  ]
+
+    puts "Restoring torque due to stiffness effects only"
+    puts $TDP
+    puts $TIE
+
     puts "Variable Stiffness applied"
+    
   }
 
 }
