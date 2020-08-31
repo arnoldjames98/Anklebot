@@ -811,18 +811,18 @@ proc applyVariableStiffness {} {
     set projy_rad [ expr  $projy * ( $pi / 180) ]
 
     # Calculate the rotation angle
-    set xdist [ expr $currentTarget_X - $previousTarget_X ]
-    set ydist [ expr $currentTarget_Y - $previousTarget_Y ]
+    #set xdist [ expr $currentTarget_X - $previousTarget_X ]
+    #set ydist [ expr $currentTarget_Y - $previousTarget_Y ]
 
     # Calculate the angle of rotation of stiffness ellipse
-    set angle [ expr atan2($ydist, $xdist) ]
-    puts "Angle:"
-    puts $angle
+    #set angle [ expr atan2($ydist, $xdist) ]
+    #puts "Angle:"
+    #puts $angle
 
     # Everything that needs to written to shared memory
-    wshm ankle_stiff_DP [ expr $overallStiffness * sin($angle)]
-    wshm ankle_stiff_IE 0.0
-    wshm ankle_stiff_k12 [ expr -1 * $overallStiffness * sin($angle) ]
+    wshm ankle_stiff_DP -10.0
+    wshm ankle_stiff_IE -10.0
+    wshm ankle_stiff_k12 0.0
     wshm ankle_stiff_k21 0.0
     # Where the stiffness equilibrium should be placed (UNITS? most likely in radians)
     wshm ankle_dp_stiff_center $projy_rad
