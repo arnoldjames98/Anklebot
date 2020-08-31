@@ -392,6 +392,14 @@ set currentBlock 1
 # Added for faster testing YOYOYOYO
 #set currentBlock 4
 set currentTrial 0
+
+# Skip the tuning and practice trials
+if {$suppressTuning == 1 } {
+  set currentTrial 80
+  set currentBlock 9
+}
+
+
 # The first target is always in the neutral position, so make it based on the random range
 set requiredTimeInsideTarget [randomInRange $neutralTimeRange]
 

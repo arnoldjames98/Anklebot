@@ -8,9 +8,27 @@ bind . <Key-q> done
 
 # ---------------Study Specifications------------------
 
+# Used for testing purposes
+set suppressTuning 1
+
 # Either DP, IE, or 2D
 # Initially set to IE since block 1 is set to be a tuning trial in the IE direction
 set targetOrientation "IE"
+
+if {$suppressTuning == 1} {
+  # Everything that needs to be set to skip all tuning trials (meaning no variable damping trials)
+  set targetOrientation "2D"
+  set currentTarget_X 0.0
+  set currentTarget_Y 0.0
+  set previousTarget_X 0.0
+  set previousTarget_Y 0.0
+  set path1_X [list 0.0 3.9 -2.4 2.4 -6.7 4.2 0.1 5.3 -0.8 -5.7 -1.6 0.0]
+  set path1_Y [list 0.0 -7.5 13.8 5.8 -2.2 -9.4 -0.6 7.2 -3.1 5.9 -14.1 0.0]
+  set targetPositionsInBlock9_X $path1_X
+  set targetPositionsInBlock9_Y $path1_Y
+  set targetPositionsInBlock_X $targetPositionsInBlock9_X
+  set targetPositionsInBlock_Y $targetPositionsInBlock9_Y
+}
 
 # Damping environments and the number of blocks for each (place in order)
 #set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_negative 1} {practice_variable 1} {positive 3} {negative 3} {variable 3}]
@@ -25,7 +43,13 @@ set targetOrientation "IE"
 
 # Pattern 2: VVV PPP VVVV PPPP
 set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_positive 1} {variable 3} {positive 3} {variable 4} {positive 4} ]
-puts "Block Pattern 2"
+#puts "Block Pattern 2"
+
+if {$suppressTuning == 1 } {
+  set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_positive 1} {zero 3} {zero 3} {zero 4} {zero 4} ]
+  puts "No variable damping, tuning is suppressed"
+}
+
 
 ###############################################################
 # TWO DIFFERENT PATTERNS FOR THE STRUCTURE OF THE STUDY ABOVE #
@@ -180,7 +204,9 @@ set ob(nlog) 25
 
 # Specifies the controller being used
 set ob(ankle_pt_ctl) 15
-set ob(ankle_stiff_ctl) 30
+# Controller is defined in /crobASU/an_uslot.c
+# The controller number is set in /crobASU/pl_uslot.c
+set ob(ankle_stiff_ctl) 31
 
 # Calibrate the robot
 puts "Loading robot kernel module..."
@@ -304,10 +330,18 @@ proc startTrials {} {
   global subjectName
   global ob
   global everyBlockEnvironment
+  global suppressTuning
+  global currentBlock
   
   puts "Start of trials"
   applyStiffness
-  setDampingEnvironment 1
+  #setDampingEnvironment 1
+
+  if {$suppressTuning ==  1} {
+    setDampingEnvironment $currentBlock
+  } else {
+    setDampingEnvironment 1
+  }
   
   # Creates a log file with a name in the form: name_damping.dat
   logSetup $subjectName [join [list "_" [lindex $everyBlockEnvironment 0]]]
@@ -700,6 +734,7 @@ proc setDampingEnvironment {currentBlock} {
   global negativeDamping_DP
   global calculatingK
   global enablingVariableDamping
+  global suppressTuning
   
   puts "Start of block $currentBlock"
   
@@ -713,7 +748,10 @@ proc setDampingEnvironment {currentBlock} {
   if {$currentDampingEnvironment == "zero" || $currentDampingEnvironment == "zero_IE" || $currentDampingEnvironment == "zero_DP" } {
     # Apply zero damping
     applyDamping 0 0
-    set calculatingK 1
+
+    if {$suppressTuning == 0 } {
+      set calculatingK 1
+    }
     
   } elseif {$currentDampingEnvironment == "tuning" || $currentDampingEnvironment == "tuning_IE" || $currentDampingEnvironment == "tuning_DP" } {
     set calculatingK 1
@@ -768,13 +806,13 @@ proc applyVariableStiffness {} {
   global pi
   global overallStiffness
 
-  puts $currentTarget_X
-  puts $currentTarget_Y
-  puts $previousTarget_X
-  puts $previousTarget_Y
+  #puts $currentTarget_X
+  #puts $currentTarget_Y
+  #puts $previousTarget_X
+  #puts $previousTarget_Y
 
   if {($currentTarget_X == 0.0 && $currentTarget_Y == 0.0 && $previousTarget_X == 0.0 && $previousTarget_Y == 0.0) || ($currentTarget_X == 0.0 && $currentTarget_Y == 0.0 && $previousTarget_X == "" && $previousTarget_Y == "")} {
-    puts "Variable Stiffness NOT applied"
+    #puts "Variable Stiffness NOT applied"
 
   } else {
 
@@ -783,9 +821,9 @@ proc applyVariableStiffness {} {
     lassign $coordinates x y
 
     # Projection point
-    puts "Current Poisition:"
-    puts $x
-    puts $y
+    #puts "Current Poisition:"
+    #puts $x
+    #puts $y
 
     # A vector
     set a1 [ expr -$x*($currentTarget_X-$previousTarget_X) - $y*($currentTarget_Y-$previousTarget_Y) ]
@@ -802,9 +840,9 @@ proc applyVariableStiffness {} {
     set projy [ expr  -((($a2*$b11)/($b11*$b22-$b12*$b21))-(($a1*$b21)/($b11*$b22-$b12*$b21))) ]
 
     # Projection point
-    puts "Projection point:"
-    puts $projx
-    puts $projy 
+    #puts "Projection point:"
+    #puts $projx
+    #puts $projy 
 
     # Convert degrees to radians
     set projx_rad [ expr  $projx * ( $pi / 180) ]
@@ -820,8 +858,8 @@ proc applyVariableStiffness {} {
     #puts $angle
 
     # Everything that needs to written to shared memory
-    wshm ankle_stiff_DP -10.0
-    wshm ankle_stiff_IE -10.0
+    wshm ankle_stiff_DP $overallStiffness
+    wshm ankle_stiff_IE $overallStiffness
     wshm ankle_stiff_k12 0.0
     wshm ankle_stiff_k21 0.0
     # Where the stiffness equilibrium should be placed (UNITS? most likely in radians)
@@ -831,23 +869,30 @@ proc applyVariableStiffness {} {
     # Check these in the shm to see what the issue is
     set xSHM [rshm ankle_ie_pos]
     set ySHM [rshm ankle_dp_pos]
-    puts "ankle_ie_pos and ankle_dp_pos"
-    puts $xSHM
-    puts $ySHM
+    #puts "ankle_ie_pos and ankle_dp_pos"
+    #puts $xSHM
+    #puts $ySHM
 
     set xref_posSHM [rshm ankle_ie_ref_pos]
     set yref_posSHM [rshm ankle_dp_ref_pos]
-    puts "ankle_ie_ref_pos and ankle_dp_ref_pos"
-    puts $xref_posSHM
-    puts $yref_posSHM
+    #puts "ankle_ie_ref_pos and ankle_dp_ref_pos"
+    #puts $xref_posSHM
+    #puts $yref_posSHM
 
     set xstiff_centerSHM [rshm ankle_ie_stiff_center]
     set ystiff_centerSHM [rshm ankle_dp_stiff_center]
-    puts "ankle_ie_stiff_center and ankle_dp_stiff_center"
-    puts $xstiff_centerSHM
-    puts $ystiff_centerSHM
+    #puts "ankle_ie_stiff_center and ankle_dp_stiff_center"
+    #puts $xstiff_centerSHM
+    #puts $ystiff_centerSHM
 
-    puts "Variable Stiffness applied"
+    # For some reason, this can't be accessed from the shared memory
+    #set torque_IE [rshm ob->ankle_ie_torque]
+    #set torque_DP [rshm ob->ankle_dp_torque]
+    #puts "ob->ankle_ie_torque and ankle_dp_torque"
+    #puts $torque_IE
+    #puts $torque_DP
+
+    #puts "Variable Stiffness applied"
   }
 
 }
