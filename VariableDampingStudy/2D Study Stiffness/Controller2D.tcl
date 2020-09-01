@@ -863,7 +863,7 @@ proc applyVariableStiffness {} {
     wshm ankle_stiff_IE $overallStiffness
     wshm ankle_stiff_k12 0.0
     wshm ankle_stiff_k21 0.0
-    # Where the stiffness equilibrium should be placed (UNITS? most likely in radians)
+    # Where the stiffness equilibrium should be placed in radians
     wshm ankle_dp_stiff_center $projy_rad
     wshm ankle_ie_stiff_center $projx_rad
 
