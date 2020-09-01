@@ -49,11 +49,14 @@ set buttonList {"Gravity" "Start"}
 
 # Colors
 set black "#000000"
-set backgroundColor1 "#CCF2F2"
-set backgroundColor2 "#7ADDDD"
+#set backgroundColor1 "#CCF2F2"
+#set backgroundColor2 "#7ADDDD"
+set backgroundColor1 "#EDDBF4"
+set backgroundColor2 "#D09AEB"
 set cursorColor "#DF0E39"
 set targetColor "#00B0F0"
-set gridColor "#97B2B5"
+#set gridColor "#97B2B5"
+set gridColor "#A38BB5"
 set insideTargetColor "#FFD45C"
 
 # -------------------Functions------------------------
@@ -343,7 +346,7 @@ wm minsize . $w $h
 wm maxsize . [expr int($w*1)] [expr int($h*1)]
 
 # Title on the top of the window
-wm title . [concat "Variable Damping Study - 2D" ]
+wm title . [concat "Variable Damping Study with 2D Stiffness" ]
 
 # Draw a grid with a certain number of degree spacing
 drawGrid $gridSpacing
@@ -388,9 +391,8 @@ set currentTarget_X 0
 set currentTarget_Y 0
 set previousTarget_X 0
 set previousTarget_Y 0
+
 set currentBlock 1
-# Added for faster testing YOYOYOYO
-#set currentBlock 4
 set currentTrial 0
 
 # Skip the tuning and practice trials
