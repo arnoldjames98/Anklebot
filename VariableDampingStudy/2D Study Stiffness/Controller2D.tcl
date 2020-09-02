@@ -68,7 +68,7 @@ set positiveDamping_DP 3
 set variableDampingRange_DP [list $negativeDamping_DP $positiveDamping_DP]
 
 # Stiffness values
-set overallStiffness 10
+set overallStiffness 50
 puts "2D stiffness will be set to $overallStiffness Nm/rad"
 
 # Initialized list of every damping enviorment in order
