@@ -16,6 +16,11 @@ set suppressTuning 1
 set targetOrientation "IE"
 
 if {$suppressTuning == 1} {
+  global selectedK_pos_IE
+  global selectedK_neg_IE
+  global selectedK_pos_DP
+  global selectedK_neg_DP
+
   # Everything that needs to be set to skip all tuning trials (meaning no variable damping trials)
   set targetOrientation "2D"
   set currentTarget_X 0.0
@@ -28,6 +33,12 @@ if {$suppressTuning == 1} {
   set targetPositionsInBlock9_Y $path1_Y
   set targetPositionsInBlock_X $targetPositionsInBlock9_X
   set targetPositionsInBlock_Y $targetPositionsInBlock9_Y
+
+  # Using k values calculated for James in an old experiment
+  set selectedK_pos_IE 0.5709778943261873
+  set selectedK_neg_IE 0.3290692829920402
+  set selectedK_pos_DP 0.2823221240681159
+  set selectedK_neg_DP 0.16154477810533047
 }
 
 # Damping environments and the number of blocks for each (place in order)
@@ -46,7 +57,8 @@ set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2
 #puts "Block Pattern 2"
 
 if {$suppressTuning == 1 } {
-  set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_positive 1} {zero 3} {zero 3} {zero 4} {zero 4} ]
+  #set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_positive 1} {zero 3} {zero 3} {zero 4} {zero 4} ]
+  set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_positive 1} {variable 3} {variable 3} {variable 4} {variable 4} ]
   puts "No variable damping, tuning is suppressed"
 }
 
