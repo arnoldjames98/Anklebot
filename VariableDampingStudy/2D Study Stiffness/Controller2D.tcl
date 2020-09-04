@@ -811,6 +811,72 @@ proc applyDamping {damping_IE damping_DP} {
   }
 }
 
+proc linFit points {
+    # linear regression y=ax+b for {{x0 y0} {x1 y1}...}
+    # returns {a b r}, where r: correlation coefficient
+    foreach i {N Sx Sy Sxy Sx2 Sy2} {set $i 0.0}
+    foreach point $points {
+        foreach {x y} $point break
+        set Sx  [expr {$Sx  + $x}]
+        set Sy  [expr {$Sy  + $y}]
+        set Sx2 [expr {$Sx2 + $x*$x}]
+        set Sy2 [expr {$Sy2 + $y*$y}]
+        set Sxy [expr {$Sxy + $x*$y}]
+        incr N
+    }
+    set t1 [expr {$N*$Sxy - $Sx*$Sy}]
+    set t2 [expr {$N*$Sx2 - $Sx*$Sx}]
+    set a [expr {double($t1)/$t2}]
+    set b [expr {double($Sy-$a*$Sx)/$N}]
+    set r [expr {$t1/(sqrt($t2)*sqrt($N*$Sy2-$Sy*$Sy))}]
+    list $a $b $r
+}
+
+# linearReg
+#    Determine the coefficients for a linear regression between
+#    two series of data (the model: Y = A + B*X)
+#
+# Arguments:
+#    xdata        Series of independent (X) data
+#    ydata        Series of dependent (Y) data
+
+# Result:
+#    List of the following items:
+#    - (Estimate of) Intercept A
+#    - (Estimate of) Slope B
+
+proc linearReg { xdata ydata } {
+
+   set sumx  0.0
+   set sumy  0.0
+   set sumx2 0.0
+   set sumy2 0.0
+   set sumxy 0.0
+   set df    0
+   foreach x $xdata y $ydata {
+      if { $x != "" && $y != "" } {
+         set sumx  [expr {$sumx+$x}]
+         set sumy  [expr {$sumy+$y}]
+         set sumx2 [expr {$sumx2+$x*$x}]
+         set sumy2 [expr {$sumy2+$y*$y}]
+         set sumxy [expr {$sumxy+$x*$y}]
+         incr df
+      }
+   }
+
+   # Calculate the intermediate quantities
+   set sx  [expr {$sumx2-$sumx*$sumx/$df}]
+   set sy  [expr {$sumy2-$sumy*$sumy/$df}]
+   set sxy [expr {$sumxy-$sumx*$sumy/$df}]
+
+   # Calculate the coefficients
+   set B [expr {$sxy/$sx}]
+   set A [expr {($sumy-$B*$sumx)/$df}]
+
+   # Return the list of parameters
+   return [list $A $B ]
+}
+
 proc applyVariableStiffness {} {
   global currentTarget_X
   global currentTarget_Y
@@ -818,6 +884,7 @@ proc applyVariableStiffness {} {
   global previousTarget_Y
   global pi
   global overallStiffness
+  global gridColor
 
   #puts $currentTarget_X
   #puts $currentTarget_Y
@@ -837,6 +904,19 @@ proc applyVariableStiffness {} {
     #puts "Current Poisition:"
     #puts $x
     #puts $y
+
+    # Perform linear regression on points where the confidence in the correct direction is high
+    # Currently, data of the actual target locations is being used (the ideal case)
+    # Eventually, many data points will be used over a short window for this calculation
+    set xdata [ list $previousTarget_X $currentTarget_X ]
+    set ydata [ list $previousTarget_Y $currentTarget_Y ]
+    set result [linearReg $xdata $ydata ]
+    puts $result
+    lassign $result intercept slope
+
+    # Draw a line representing the equilibrium line where the stiffness is being applied
+    .right.view delete stiffLine
+    .right.view create line [drawLine -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept] ] -fill $gridColor -tags stiffLine -width 3 -dash -
 
     # A vector
     set a1 [ expr -$x*($currentTarget_X-$previousTarget_X) - $y*($currentTarget_Y-$previousTarget_Y) ]
