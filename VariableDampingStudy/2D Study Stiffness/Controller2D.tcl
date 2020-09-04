@@ -80,7 +80,8 @@ set positiveDamping_DP 3
 set variableDampingRange_DP [list $negativeDamping_DP $positiveDamping_DP]
 
 # Stiffness values
-set overallStiffness 50
+#set overallStiffness 50
+set overallStiffness 0
 puts "2D stiffness will be set to $overallStiffness Nm/rad"
 
 # Initialized list of every damping enviorment in order
@@ -911,12 +912,12 @@ proc applyVariableStiffness {} {
     set xdata [ list $previousTarget_X $currentTarget_X ]
     set ydata [ list $previousTarget_Y $currentTarget_Y ]
     set result [linearReg $xdata $ydata ]
-    puts $result
+    #puts $result
     lassign $result intercept slope
 
     # Draw a line representing the equilibrium line where the stiffness is being applied
-    .right.view delete stiffLine
-    .right.view create line [drawLine -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept] ] -fill $gridColor -tags stiffLine -width 3 -dash -
+    #.right.view delete stiffLine
+    #.right.view create line [drawLine -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept] ] -fill $gridColor -tags stiffLine -width 3 -dash -
 
     # A vector
     set a1 [ expr -$x*($currentTarget_X-$previousTarget_X) - $y*($currentTarget_Y-$previousTarget_Y) ]
@@ -1048,6 +1049,11 @@ set maxVal -999999899
 set minVal 999999899
 set maxTime 0
 set minTime 0
+set previous_vtimesa_IE 0
+set previous_vtimesa_DP 0
+set enablingCalcStiffEquil 0
+set xPositions { }
+set yPositions { }
 
 # Main loop used for calculating k and for applying variable damping
 every 10 {
@@ -1078,6 +1084,11 @@ every 10 {
   global selectedK_pos_DP
   global selectedK_neg_DP
   global currentTarget
+  global previous_vtimesa_IE
+  global previous_vtimesa_DP
+  global enablingCalcStiffEquil
+  global xPositions
+  global yPositions
 
   if {$targetOrientation == "2D"} {
     applyVariableStiffness
@@ -1234,9 +1245,71 @@ every 10 {
       # Negative
       set damping_DP [ expr { (-1) * ( ( 2 * $b_UB_DP ) / (1 + exp( (-1) * $selectedK_neg_DP * $vel_DP * $accel_DP) ) - $b_UB_DP ) } ]
     }
+
+    # Calculate the overal user intent
+    set previous_vtimesa_sum [ expr $previous_vtimesa_IE + $previous_vtimesa_DP]
+    set vtimesa_sum [ expr $vtimesa_IE + $vtimesa_DP]
+
+    # If the intent as just passed 0.1
+    #puts $previous_vtimesa_sum
+    #puts $vtimesa_sum
+
+    # 0.1 is the horizontal line on the vtimesa plot that is used as the threshold of when to start calculating intent
+    if { $previous_vtimesa_sum < 0.1 && $vtimesa_sum >= 0.1 } {
+      #puts "CALCULATE NEW STIFFNESS EQUILIBRUIM"
+      set xPositions { }
+      set yPositions { }
+      set enablingCalcStiffEquil 1
+    }
+
+    set previous_vtimesa_IE $vtimesa_IE 
+    set previous_vtimesa_DP $vtimesa_DP
     
     # Now that the correct IE, DP, +, and - damping has been found for this time step, set the damping
     applyDamping $damping_IE $damping_DP
 
   }
+
+  # Runs if the intent changed from negative to positive, which often cooresponds to a change in direction
+  if {$enablingCalcStiffEquil == 1} {
+    # Find the position coordinates of the robot in degrees
+    set coordinates [getRobotPosition .right.view]
+    lassign $coordinates x y
+
+    lappend xPositions $x
+    lappend yPositions $y
+
+    #puts $xPositions
+
+
+    if { [llength $xPositions] >= 20} {
+      global gridColor
+      
+      set result [linearReg $xPositions $yPositions]
+    #puts $result
+    lassign $result intercept slope
+
+    # Draw a line representing the equilibrium line where the stiffness is being applied
+    .right.view delete stiffLine
+    .right.view create line [drawLine -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept] ] -fill $gridColor -tags stiffLine -width 3 -dash -
+    
+    #puts "Clear list"
+      set xPositions { }
+      set yPositions { }
+      set enablingCalcStiffEquil 0
+
+    }
+
+    # Projection point
+    #puts "Current Poisition:"
+    #puts $x
+    #puts $y
+
+    # Perform linear regression on points where the confidence in the correct direction is high
+    # Currently, data of the actual target locations is being used (the ideal case)
+    # Eventually, many data points will be used over a short window for this calculation
+  }
+
+
+
 }
