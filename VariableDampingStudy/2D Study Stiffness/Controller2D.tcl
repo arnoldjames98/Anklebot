@@ -80,8 +80,8 @@ set positiveDamping_DP 3
 set variableDampingRange_DP [list $negativeDamping_DP $positiveDamping_DP]
 
 # Stiffness values
-#set overallStiffness 50
-set overallStiffness 0
+set overallStiffness 50
+#set overallStiffness 0
 puts "2D stiffness will be set to $overallStiffness Nm/rad"
 
 # Initialized list of every damping enviorment in order
@@ -878,7 +878,9 @@ proc linearReg { xdata ydata } {
    return [list $A $B ]
 }
 
-proc applyVariableStiffness {} {
+# stiff is 0 or 1 depending on if it's on or off
+# startX, startY, endX, endY coorespond to points on the line of direction intent
+proc applyVariableStiffness {stiff startX startY endX endY} {
   global currentTarget_X
   global currentTarget_Y
   global previousTarget_X
@@ -892,42 +894,27 @@ proc applyVariableStiffness {} {
   #puts $previousTarget_X
   #puts $previousTarget_Y
 
-  if {($currentTarget_X == 0.0 && $currentTarget_Y == 0.0 && $previousTarget_X == 0.0 && $previousTarget_Y == 0.0) || ($currentTarget_X == 0.0 && $currentTarget_Y == 0.0 && $previousTarget_X == "" && $previousTarget_Y == "")} {
-    #puts "Variable Stiffness NOT applied"
-
+  if {$stiff == 0} {
+    wshm ankle_stiff_DP 0.0
+    wshm ankle_stiff_IE 0.0
+    wshm ankle_stiff_k12 0.0
+    wshm ankle_stiff_k21 0.0
+  
   } else {
 
     # Find the position coordinates of the robot in degrees
     set coordinates [getRobotPosition .right.view]
     lassign $coordinates x y
 
-    # Projection point
-    #puts "Current Poisition:"
-    #puts $x
-    #puts $y
-
-    # Perform linear regression on points where the confidence in the correct direction is high
-    # Currently, data of the actual target locations is being used (the ideal case)
-    # Eventually, many data points will be used over a short window for this calculation
-    set xdata [ list $previousTarget_X $currentTarget_X ]
-    set ydata [ list $previousTarget_Y $currentTarget_Y ]
-    set result [linearReg $xdata $ydata ]
-    #puts $result
-    lassign $result intercept slope
-
-    # Draw a line representing the equilibrium line where the stiffness is being applied
-    #.right.view delete stiffLine
-    #.right.view create line [drawLine -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept] ] -fill $gridColor -tags stiffLine -width 3 -dash -
-
     # A vector
-    set a1 [ expr -$x*($currentTarget_X-$previousTarget_X) - $y*($currentTarget_Y-$previousTarget_Y) ]
-    set a2 [ expr -$previousTarget_Y*($currentTarget_X-$previousTarget_X) + $previousTarget_X*($currentTarget_Y-$previousTarget_Y) ]
+    set a1 [ expr -$x*($endX-$startX) - $y*($endY-$startY) ]
+    set a2 [ expr -$startY*($endX-$startX) + $startX*($endY-$startY) ]
 
     # B matrix
-    set b11 [ expr $currentTarget_X - $previousTarget_X ]
-    set b12 [ expr $currentTarget_Y - $previousTarget_Y ]
-    set b21 [ expr $previousTarget_Y - $currentTarget_Y ]
-    set b22 [ expr $currentTarget_X - $previousTarget_X ]
+    set b11 [ expr $endX - $startX ]
+    set b12 [ expr $endY - $startY ]
+    set b21 [ expr $startY - $endY ]
+    set b22 [ expr $endX - $startX ]
 
     # Calculate projection
     set projx [ expr  -((($a1*$b22)/($b11*$b22-$b12*$b21))-(($a2*$b12)/($b11*$b22-$b12*$b21))) ]
@@ -943,8 +930,8 @@ proc applyVariableStiffness {} {
     set projy_rad [ expr  $projy * ( $pi / 180) ]
 
     # Calculate the rotation angle
-    #set xdist [ expr $currentTarget_X - $previousTarget_X ]
-    #set ydist [ expr $currentTarget_Y - $previousTarget_Y ]
+    #set xdist [ expr $endX - $startX ]
+    #set ydist [ expr $endY - $startY ]
 
     # Calculate the angle of rotation of stiffness ellipse
     #set angle [ expr atan2($ydist, $xdist) ]
@@ -1090,9 +1077,9 @@ every 10 {
   global xPositions
   global yPositions
 
-  if {$targetOrientation == "2D"} {
-    applyVariableStiffness
-  }
+  #if {$targetOrientation == "2D"} {
+  #  applyVariableStiffness
+  #}
   
   # When k is being calculated OR variable damping (1D or 2D) is enabled, need to find vel and accel
   if {$calculatingK == 1 || $enablingVariableDamping == 1 || $enablingVariableDamping == 2} {
@@ -1255,11 +1242,16 @@ every 10 {
     #puts $vtimesa_sum
 
     # 0.1 is the horizontal line on the vtimesa plot that is used as the threshold of when to start calculating intent
-    if { $previous_vtimesa_sum < 0.1 && $vtimesa_sum >= 0.1 } {
+    if { $previous_vtimesa_sum < 0.01 && $vtimesa_sum >= 0.01 } {
       #puts "CALCULATE NEW STIFFNESS EQUILIBRUIM"
       set xPositions { }
       set yPositions { }
       set enablingCalcStiffEquil 1
+    }
+
+    # Set zero stiffness when intent is negative
+    if { $vtimesa_sum <= 0.01 } {
+      applyVariableStiffness 0 0 0 0 0
     }
 
     set previous_vtimesa_IE $vtimesa_IE 
@@ -1282,9 +1274,13 @@ every 10 {
     #puts $xPositions
 
 
-    if { [llength $xPositions] >= 20} {
+    # Once the length of the list is a certain length (ie. enought time has ellapsed to make a calculation)
+    if { [llength $xPositions] >= 10} {
       global gridColor
       
+      # Perform linear regression on points where the confidence in the correct direction is high
+    # Currently, data of the actual target locations is being used (the ideal case)
+    # Eventually, many data points will be used over a short window for this calculation
       set result [linearReg $xPositions $yPositions]
     #puts $result
     lassign $result intercept slope
@@ -1293,6 +1289,8 @@ every 10 {
     .right.view delete stiffLine
     .right.view create line [drawLine -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept] ] -fill $gridColor -tags stiffLine -width 3 -dash -
     
+    applyVariableStiffness 1 -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
+
     #puts "Clear list"
       set xPositions { }
       set yPositions { }
