@@ -71,13 +71,15 @@ if {$suppressTuning == 1 } {
 set trialsPerBlock 10
 #set extraTrialsForDataCollection 0 # Unlike the last study, we still have 10 trials per block
 
-# Damping values
-set negativeDamping_IE -0.5
-set positiveDamping_IE 1.5
+# Damping values (must take into account offset for all ranges!)
+set negativeDamping_IE -0.75
+set positiveDamping_IE 1.25
 set variableDampingRange_IE [list $negativeDamping_IE $positiveDamping_IE]
-set negativeDamping_DP -1
-set positiveDamping_DP 3
+set negativeDamping_DP -1.25
+set positiveDamping_DP 2.75
 set variableDampingRange_DP [list $negativeDamping_DP $positiveDamping_DP]
+
+set variableDampingOffset 0.25
 
 # Stiffness values
 set overallStiffness 50
@@ -1076,6 +1078,7 @@ every 10 {
   global enablingCalcStiffEquil
   global xPositions
   global yPositions
+  global variableDampingOffset
 
   #if {$targetOrientation == "2D"} {
   #  applyVariableStiffness
@@ -1170,6 +1173,7 @@ every 10 {
     # Find the damping range
     set b_UB [lindex $variableDampingRange 1]
     set b_LB [lindex $variableDampingRange 0]
+    set b_C $variableDampingOffset
     
     #puts "vel: $vel rad/s"
     #puts "accel: $accel rad^2/s"
@@ -1182,7 +1186,7 @@ every 10 {
     if { $vtimesa >= 0 } {
       # Send the selected variable damping k to the log
       wshm ankle_varDamp_K $selectedK_pos
-      set damping [ expr { ( 2 * $b_LB ) / (1 + exp( (-1) * $selectedK_pos * $vel * $accel) ) - $b_LB } ]
+      set damping [ expr { ( 2 * $b_LB ) / (1 + exp( (-1) * $selectedK_pos * $vel * $accel) ) - $b_LB + $b_C } ]
       # Only the appropriate damping will be set (look at function, the other direction will be set to 1)
       applyDamping $damping $damping
       
@@ -1190,7 +1194,7 @@ every 10 {
     } else {
       # Send the selected variable damping k to the log
       wshm ankle_varDamp_K $selectedK_neg
-      set damping [ expr { (-1) * ( ( 2 * $b_UB ) / (1 + exp( (-1) * $selectedK_neg * $vel * $accel) ) - $b_UB ) } ]
+      set damping [ expr { (-1) * ( ( 2 * $b_UB ) / (1 + exp( (-1) * $selectedK_neg * $vel * $accel) ) - $b_UB ) + $b_C } ]
       # Only the appropriate damping will be set (look at function, the other direction will be set to 1)
       applyDamping $damping $damping
     }
@@ -1206,6 +1210,7 @@ every 10 {
     set b_LB_IE [lindex $variableDampingRange_IE 0]
     set b_UB_DP [lindex $variableDampingRange_DP 1]
     set b_LB_DP [lindex $variableDampingRange_DP 0]
+    set b_C $variableDampingOffset
     
     #puts "vel: $vel rad/s"
     #puts "accel: $accel rad^2/s"
@@ -1218,19 +1223,19 @@ every 10 {
     # IE direction intent
     if { $vtimesa_IE >= 0 } {
       # Positive
-      set damping_IE [ expr { ( 2 * $b_LB_IE ) / (1 + exp( (-1) * $selectedK_pos_IE * $vel_IE * $accel_IE) ) - $b_LB_IE } ]
+      set damping_IE [ expr { ( 2 * $b_LB_IE ) / (1 + exp( (-1) * $selectedK_pos_IE * $vel_IE * $accel_IE) ) - $b_LB_IE + $b_C } ]
     } else {
       # Negative
-      set damping_IE [ expr { (-1) * ( ( 2 * $b_UB_IE ) / (1 + exp( (-1) * $selectedK_neg_IE * $vel_IE * $accel_IE) ) - $b_UB_IE ) } ]
+      set damping_IE [ expr { (-1) * ( ( 2 * $b_UB_IE ) / (1 + exp( (-1) * $selectedK_neg_IE * $vel_IE * $accel_IE) ) - $b_UB_IE) + $b_C } ]
     }
     
     # DP direction intent
     if { $vtimesa_DP >= 0 } {
       # Positive
-      set damping_DP [ expr { ( 2 * $b_LB_DP ) / (1 + exp( (-1) * $selectedK_pos_DP * $vel_DP * $accel_DP) ) - $b_LB_DP } ]
+      set damping_DP [ expr { ( 2 * $b_LB_DP ) / (1 + exp( (-1) * $selectedK_pos_DP * $vel_DP * $accel_DP) ) - $b_LB_DP + $b_C } ]
     } else {
       # Negative
-      set damping_DP [ expr { (-1) * ( ( 2 * $b_UB_DP ) / (1 + exp( (-1) * $selectedK_neg_DP * $vel_DP * $accel_DP) ) - $b_UB_DP ) } ]
+      set damping_DP [ expr { (-1) * ( ( 2 * $b_UB_DP ) / (1 + exp( (-1) * $selectedK_neg_DP * $vel_DP * $accel_DP) ) - $b_UB_DP ) + $b_C } ]
     }
 
     # Calculate the overal user intent
