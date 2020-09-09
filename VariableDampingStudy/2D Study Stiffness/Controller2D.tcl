@@ -686,6 +686,7 @@ proc endTrial {currentTrial} {
   global variableDampingRange_IE
   global variableDampingRange_DP
   global targetOrientation
+  global pathPoint
   
   
   # Find the current damping enviornment
@@ -694,7 +695,7 @@ proc endTrial {currentTrial} {
   # Output the current trial and its damping enviornment
   #puts "Trial $currentTrial of $totalTrials complete ($currentDampingEnvironment damping)"
   puts "Trial $currentTrial of $totalTrials complete"
-  
+  .right.view delete pathPoint
   
   # Determine whether or not k needs to be calculated
   if {$calculatingK == 1} {
@@ -1038,14 +1039,18 @@ set maxVal -999999899
 set minVal 999999899
 set maxTime 0
 set minTime 0
+
+# Variables initialized for variable stiffness calculation
 set previous_vtimesa_IE 0
 set previous_vtimesa_DP 0
 set enablingCalcStiffEquil 0
 set xPositions { }
 set yPositions { }
+set slope 1
+set intercept 0
 
 # Main loop used for calculating k and for applying variable damping
-every 10 {
+every 1 {
   global calculatingK
   global enablingVariableDamping
   global variableDampingRange
@@ -1079,10 +1084,19 @@ every 10 {
   global xPositions
   global yPositions
   global variableDampingOffset
+  global posDampColor
+  global negDampColor
+  global black
+  global targetColor
+  global interpPoint
+  global pathPoint
+  global slope
+  global intercept
 
-  #if {$targetOrientation == "2D"} {
-  #  applyVariableStiffness
-  #}
+  if {$targetOrientation == "2D"} {
+    # Slope and intercept will be calculated below, but we still need to set the stiffness at all timesteps
+    applyVariableStiffness 1 -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
+  }
   
   # When k is being calculated OR variable damping (1D or 2D) is enabled, need to find vel and accel
   if {$calculatingK == 1 || $enablingVariableDamping == 1 || $enablingVariableDamping == 2} {
@@ -1247,9 +1261,9 @@ every 10 {
     set coordinates [getRobotPosition .right.view]
     lassign $coordinates x y
     if { $vtimesa_sum >= 0 } {
-      set pathPoint [.right.view create oval [drawCircle $x $y 0.05 ] -fill $negDampColor -outline $black -width 0]
+      set pathPoint [.right.view create oval [drawCircle $x $y 0.2 ] -fill $negDampColor -outline $black -width 0 -tags pathPoint]
     } else {
-      set pathPoint [.right.view create oval [drawCircle $x $y 0.05 ] -fill $posDampColor -outline $black -width 0]
+      set pathPoint [.right.view create oval [drawCircle $x $y 0.2 ] -fill $posDampColor -outline $black -width 0 -tags pathPoint]
     }
 
 
@@ -1257,19 +1271,21 @@ every 10 {
     #puts $previous_vtimesa_sum
     #puts $vtimesa_sum
 
+
     # 0.1 is the horizontal line on the vtimesa plot that is used as the threshold of when to start calculating intent
-    if { $previous_vtimesa_sum < 0.01 && $vtimesa_sum >= 0.01 } {
+    if { $previous_vtimesa_sum < 0.1 && $vtimesa_sum >= 0.1 } {
       #puts "CALCULATE NEW STIFFNESS EQUILIBRUIM"
       set xPositions { }
       set yPositions { }
-      .right.view delete interpPoint
+      
+      #.right.view itemconfigure $::interpPoint -fill ""
       set enablingCalcStiffEquil 1
     }
 
     # Set zero stiffness when intent is negative
-    if { $vtimesa_sum <= 0.01 } {
-      applyVariableStiffness 0 0 0 0 0
-    }
+    #if { $vtimesa_sum <= 0.01 } {
+    #  applyVariableStiffness 0 0 0 0 0
+    #}
 
     set previous_vtimesa_IE $vtimesa_IE 
     set previous_vtimesa_DP $vtimesa_DP
@@ -1288,14 +1304,21 @@ every 10 {
     lappend xPositions $x
     lappend yPositions $y
 
-    set interpPoint [.right.view create oval [drawCircle $x $y 0.1 ] -fill $targetColor -outline $black -width 0]
+    #set interpPoint [.right.view create oval [drawCircle $x $y 0.1 ] -fill $targetColor -outline $black -width 0 -tags interpPoint]
 
     #puts $xPositions
 
 
     # Once the length of the list is a certain length (ie. enought time has ellapsed to make a calculation)
-    if { [llength $xPositions] >= 10} {
+    if { [llength $xPositions] >= 30} {
       global gridColor
+      # Delete the points used in the previous interpolation
+      .right.view delete interpPoint
+      # Draw all of the interpolation points being used for the regression
+      foreach xPoint $xPositions yPoint $yPositions  {
+
+        set interpPoint [.right.view create oval [drawCircle $xPoint $yPoint 0.30 ] -fill "" -outline $black -width 0.01 -tags interpPoint]
+      }
       
       # Perform linear regression on points where the confidence in the correct direction is high
     # Currently, data of the actual target locations is being used (the ideal case)
@@ -1306,19 +1329,22 @@ every 10 {
 
     # Draw a line representing the equilibrium line where the stiffness is being applied
     .right.view delete stiffLine
-    
 
     .right.view create line [drawLine -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept] ] -fill $gridColor -tags stiffLine -width 3 -dash -
     
+    # First one means, yes apply stiffness, all other quanties specify along what path
     applyVariableStiffness 1 -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
 
     #puts "Clear list"
       set xPositions { }
       set yPositions { }
       set enablingCalcStiffEquil 0
-      .right.view delete interpPoint
+      #.right.view itemconfigure $::interpPoint -fill ""
+      #.right.view delete interpPoint
 
     }
+
+
 
     # Projection point
     #puts "Current Poisition:"

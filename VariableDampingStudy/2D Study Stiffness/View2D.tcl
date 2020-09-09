@@ -59,8 +59,8 @@ set targetColor "#00B0F0"
 set gridColor "#A38BB5"
 set insideTargetColor "#FFD45C"
 
-set negDampColor "FF7F32"
-set posDampColor "78BE21"
+set negDampColor "#FF7F32"
+set posDampColor "#78BE21"
 
 # -------------------Functions------------------------
 
