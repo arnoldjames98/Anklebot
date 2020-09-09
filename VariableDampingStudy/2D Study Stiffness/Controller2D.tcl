@@ -942,8 +942,8 @@ proc applyVariableStiffness {stiff startX startY endX endY} {
     #puts $angle
 
     # Everything that needs to written to shared memory
-    wshm ankle_stiff_DP $overallStiffness
-    wshm ankle_stiff_IE $overallStiffness
+    wshm ankle_stiff_DP $stiff
+    wshm ankle_stiff_IE $stiff
     wshm ankle_stiff_k12 0.0
     wshm ankle_stiff_k21 0.0
     # Where the stiffness equilibrium should be placed in radians
@@ -1092,11 +1092,12 @@ every 1 {
   global pathPoint
   global slope
   global intercept
+  global overallStiffness
 
-  if {$targetOrientation == "2D"} {
+  #if {$targetOrientation == "2D"} {
     # Slope and intercept will be calculated below, but we still need to set the stiffness at all timesteps
-    applyVariableStiffness 1 -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
-  }
+    #applyVariableStiffness 1 -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
+  #}
   
   # When k is being calculated OR variable damping (1D or 2D) is enabled, need to find vel and accel
   if {$calculatingK == 1 || $enablingVariableDamping == 1 || $enablingVariableDamping == 2} {
@@ -1256,6 +1257,17 @@ every 1 {
     set previous_vtimesa_sum [ expr $previous_vtimesa_IE + $previous_vtimesa_DP]
     set vtimesa_sum [ expr $vtimesa_IE + $vtimesa_DP]
 
+    # Send stiffness based on a pre-made logistic function that provides near zero stiffness when intent is
+    # less than zero and maximum stiffness when user intent is around 4 (k = -2.75)
+    set variableStiffness [expr $overallStiffness / ( 1 + exp( -2.75 * $vtimesa_sum + 6.0 ) ) ]
+
+    # First one means, yes apply stiffness, all other quanties specify along what path
+    # Slope and intercept are updated later in the code below
+    #applyVariableStiffness $variableStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
+    
+    # Always apply a constant stiffness at the maximum (useful for testing)
+    applyVariableStiffness $overallStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
+
 
     # Draw a path with the color represending the current user intent
     set coordinates [getRobotPosition .right.view]
@@ -1332,8 +1344,12 @@ every 1 {
 
     .right.view create line [drawLine -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept] ] -fill $gridColor -tags stiffLine -width 3 -dash -
     
+    # Send stiffness based on a pre-made logistic function that provides near zero stiffness when intent is
+    # less than zero and maximum stiffness when user intent is around 4 (k = -2.75)
+    #set variableStiffness [expr $overallStiffness / ( 1 + exp( -2.75 * $vtimesa_sum + 6.0 ) ) ]
+
     # First one means, yes apply stiffness, all other quanties specify along what path
-    applyVariableStiffness 1 -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
+    #applyVariableStiffness $variableStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
 
     #puts "Clear list"
       set xPositions { }
