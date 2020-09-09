@@ -1237,6 +1237,17 @@ every 10 {
     set previous_vtimesa_sum [ expr $previous_vtimesa_IE + $previous_vtimesa_DP]
     set vtimesa_sum [ expr $vtimesa_IE + $vtimesa_DP]
 
+
+    # Draw a path with the color represending the current user intent
+    set coordinates [getRobotPosition .right.view]
+    lassign $coordinates x y
+    if { $vtimesa_sum >= 0 } {
+      set pathPoint [.right.view create oval [drawCircle $x $y 0.05 ] -fill $negDampColor -outline $black -width 0]
+    } else {
+      set pathPoint [.right.view create oval [drawCircle $x $y 0.05 ] -fill $posDampColor -outline $black -width 0]
+    }
+
+
     # If the intent as just passed 0.1
     #puts $previous_vtimesa_sum
     #puts $vtimesa_sum
@@ -1246,6 +1257,7 @@ every 10 {
       #puts "CALCULATE NEW STIFFNESS EQUILIBRUIM"
       set xPositions { }
       set yPositions { }
+      .right.view delete interpPoint
       set enablingCalcStiffEquil 1
     }
 
@@ -1271,6 +1283,8 @@ every 10 {
     lappend xPositions $x
     lappend yPositions $y
 
+    set interpPoint [.right.view create oval [drawCircle $x $y 0.1 ] -fill $targetColor -outline $black -width 0]
+
     #puts $xPositions
 
 
@@ -1287,6 +1301,8 @@ every 10 {
 
     # Draw a line representing the equilibrium line where the stiffness is being applied
     .right.view delete stiffLine
+    
+
     .right.view create line [drawLine -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept] ] -fill $gridColor -tags stiffLine -width 3 -dash -
     
     applyVariableStiffness 1 -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
@@ -1295,6 +1311,7 @@ every 10 {
       set xPositions { }
       set yPositions { }
       set enablingCalcStiffEquil 0
+      .right.view delete interpPoint
 
     }
 
