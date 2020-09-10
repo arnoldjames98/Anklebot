@@ -250,14 +250,14 @@ if {[rshm paused]} {
 wshm logfnid 23
 
 # Load ankle parameters from shm.tcl (this might not be needed)
-wshm ankle_stiff 300.0
+wshm ankle_stiff 200.0
 wshm ankle_damp 2.0
 wshm stiff 0.0
 wshm damp 0.0
 
 # Set the stiffness and damping in preparation for gravity compensation
 wshm ankle_stiff_DP 200
-wshm ankle_stiff_IE 400.0
+wshm ankle_stiff_IE 200.0
 wshm ankle_stiff_k12 0.0
 wshm ankle_stiff_k21 0.0
 wshm ankle_dp_stiff_center 0.0
@@ -1261,12 +1261,17 @@ every 1 {
     # less than zero and maximum stiffness when user intent is around 4 (k = -2.75)
     set variableStiffness [expr $overallStiffness / ( 1 + exp( -2.75 * $vtimesa_sum + 6.0 ) ) ]
 
+
+
+
     # First one means, yes apply stiffness, all other quanties specify along what path
     # Slope and intercept are updated later in the code below
-    #applyVariableStiffness $variableStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
+    applyVariableStiffness $variableStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
     
     # Always apply a constant stiffness at the maximum (useful for testing)
-    applyVariableStiffness $overallStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
+    #applyVariableStiffness $overallStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
+
+
 
 
     # Draw a path with the color represending the current user intent
@@ -1322,7 +1327,7 @@ every 1 {
 
 
     # Once the length of the list is a certain length (ie. enought time has ellapsed to make a calculation)
-    if { [llength $xPositions] >= 30} {
+    if { [llength $xPositions] >= 20} {
       global gridColor
       # Delete the points used in the previous interpolation
       .right.view delete interpPoint
