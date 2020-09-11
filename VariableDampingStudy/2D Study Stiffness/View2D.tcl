@@ -222,24 +222,26 @@ proc buttonAction {place} {
 }
 
 # Predefined paths for 2D data collection trials
-# These paths are designed so that the +/- x-direction total distance both equal 30.5 degrees
-# and the +/- y-direction total distance both equal 61.0 degrees and fit inside and elliptical workspace
+# These paths are designed so that they never go outside of an elliptical workspace: 15 DP and 7.5 IE
+# Mininum distance between consecutive targets: 5 DP and 2.5 IE
+# Maximum distance between consecutive targets: 10 DP and 5 IE
+# The total IE distance (21.2) traveled is equal to DP distance traveled times two (42.4)
 
 # Path 1
-set path1_X [list 0.0 3.9 -2.4 2.4 -6.7 4.2 0.1 5.3 -0.8 -5.7 -1.6 0.0]
-set path1_Y [list 0.0 -7.5 13.8 5.8 -2.2 -9.4 -0.6 7.2 -3.1 5.9 -14.1 0.0]
+set path1_X [list 0.0 4.0 -0.1 -4.3 0.4 3.0 -0.6 2.0 -2.7 0.1 4.6 0.0]
+set path1_Y [list 0.0 -9.2 -1.4 4.1 12.6 4.0 12.3 4.5 -5.4 -12.3 -3.1 0.0]
 
 # Path 2          
-set path2_X [list 0.0 -3.9 2.4 -2.4 6.7 -4.2 -0.1 -5.3 0.8 5.7 1.6 0.0]
-set path2_Y [list 0.0 -7.5 13.8 5.8 -2.2 -9.4 -0.6 7.2 -3.1 5.9 -14.1 0.0]
+set path2_X [list 0.0 -4.0 0.1 4.3 -0.4 -3.0 0.6 -2.0 2.7 -0.1 -4.6 0.0]
+set path2_Y [list 0.0 -9.2 -1.4 4.1 12.6 4.0 12.3 4.5 -5.4 -12.3 -3.1 0.0]
 
 # Path 3      
-set path3_X [list 0.0 3.9 -2.4 2.4 -6.7 4.2 0.1 5.3 -0.8 -5.7 -1.6 0.0]
-set path3_Y [list 0.0 7.5 -13.8 -5.8 2.2 9.4 0.6 -7.2 3.1 -5.9 14.1 0.0]
+set path3_X [list 0.0 4.0 -0.1 -4.3 0.4 3.0 -0.6 2.0 -2.7 0.1 4.6 0.0]
+set path3_Y [list 0.0 9.2 1.4 -4.1 -12.6 -4.0 -12.3 -4.5 5.4 12.3 3.1 0.0]
 
 # Path 4     
-set path4_X [list 0.0 -3.9 2.4 -2.4 6.7 -4.2 -0.1 -5.3 0.8 5.7 1.6 0.0]
-set path4_Y [list 0.0 7.5 -13.8 -5.8 2.2 9.4 0.6 -7.2 3.1 -5.9 14.1 0.0]
+set path4_X [list 0.0 -4.0 0.1 4.3 -0.4 -3.0 0.6 -2.0 2.7 -0.1 -4.6 0.0]
+set path4_Y [list 0.0 9.2 1.4 -4.1 -12.6 -4.0 -12.3 -4.5 5.4 12.3 3.1 0.0]
 
 # Target Positions in the tuning blocks
 # These are both for the x direction

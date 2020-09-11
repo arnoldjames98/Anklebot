@@ -27,8 +27,8 @@ if {$suppressTuning == 1} {
   set currentTarget_Y 0.0
   set previousTarget_X 0.0
   set previousTarget_Y 0.0
-  set path1_X [list 0.0 3.9 -2.4 2.4 -6.7 4.2 0.1 5.3 -0.8 -5.7 -1.6 0.0]
-  set path1_Y [list 0.0 -7.5 13.8 5.8 -2.2 -9.4 -0.6 7.2 -3.1 5.9 -14.1 0.0]
+  set path1_X [list 0.0 4.0 -0.1 -4.3 0.4 3.0 -0.6 2.0 -2.7 0.1 4.6 0.0]
+  set path1_Y [list 0.0 -9.2 -1.4 4.1 12.6 4.0 12.3 4.5 -5.4 -12.3 -3.1 0.0]
   set targetPositionsInBlock9_X $path1_X
   set targetPositionsInBlock9_Y $path1_Y
   set targetPositionsInBlock_X $targetPositionsInBlock9_X
