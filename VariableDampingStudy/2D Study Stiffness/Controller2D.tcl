@@ -220,7 +220,7 @@ source $ob(crobhome)/shm.tcl
 cd $ob(crobhome)/tools
 
 # Columns in the .dat file (found in an_ulog.c)
-set ob(nlog) 25
+set ob(nlog) 29
 
 # Specifies the controller being used
 set ob(ankle_pt_ctl) 15
@@ -250,8 +250,8 @@ if {[rshm paused]} {
 }
 
 # Specificies which C log function to use (id defined in pl_ulog.c and function defined in an_ulog.c)
-# 23 is the new one for 2D, 22 was the old one for 1D, had to also set ob(nlog) to 25 above since 25 col now
-wshm logfnid 23
+# 24 is the new one for 2D with stiffness, 22 was the old one for 1D, had to also set ob(nlog) to 29 above since 29 col now
+wshm logfnid 24
 
 # Load ankle parameters from shm.tcl (this might not be needed)
 wshm ankle_stiff 200.0
@@ -1333,13 +1333,14 @@ every 1 {
     #puts $xPositions
 
     # Check to see if the subject as moved far enough to calculate a new stiffness equilibrium
-    if { ( [llength $xPositions] >= 1 ) && (calcStiffEquilCritera == "spatial" ) } {
+    if { ( [llength $xPositions] >= 1 ) && ($calcStiffEquilCritera == "spatial" ) } {
       # Pull the first point
       set x0 [lindex $xPositions 0]
       set y0 [lindex $yPositions 0]
 
-      set distTraveled [expr sqrt( (x - x0)^2 + (y - y0)^2 )]
-      if {distTraveled >= 1.5} {
+      # pow(x,y) = x^y
+      set distTraveled [expr sqrt( pow(($x - $x0),2) + pow(($y - $y0),2) )]
+      if {$distTraveled >= 1.5} {
         set spatialCriteria 1
       } else {
         set spatialCriteria 0
@@ -1348,7 +1349,7 @@ every 1 {
     }
     
     # Check to see if enough time has ellapsed to calculate a new stiffness equilibrium
-    if { ([llength $xPositions] >= 20) && (calcStiffEquilCritera == "temporal" )} {
+    if { ([llength $xPositions] >= 20) && ($calcStiffEquilCritera == "temporal" )} {
       set temporalCriteria 1
     } else {
       set temporalCriteria 0
@@ -1356,7 +1357,7 @@ every 1 {
 
 
     # If either one of the criteria is met
-    if { (spatialCriteria == 1) || (temporalCriteria == 1) } {
+    if { ($spatialCriteria == 1) || ($temporalCriteria == 1) } {
 
       global gridColor
       # Delete the points used in the previous interpolation
@@ -1373,6 +1374,10 @@ every 1 {
       set result [linearReg $xPositions $yPositions]
       #puts $result
       lassign $result intercept slope
+
+      # Write the new slope and intercept to the shared memory
+      wshm ankle_stiff_slope $slope
+      wshm ankle_stiff_intercept $intercept
       
       # Draw a line representing the equilibrium line where the stiffness is being applied
       .right.view delete stiffLine
