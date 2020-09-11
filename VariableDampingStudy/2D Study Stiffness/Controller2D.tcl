@@ -11,6 +11,10 @@ bind . <Key-q> done
 # Used for testing purposes
 set suppressTuning 1
 
+# Which type of critera would you like to use for when to calculate a new stiffness equilibirum line
+# Set to either "spatial" or "temporal"
+set calcStiffEquilCritera "spatial"
+
 # Either DP, IE, or 2D
 # Initially set to IE since block 1 is set to be a tuning trial in the IE direction
 set targetOrientation "IE"
@@ -1093,6 +1097,9 @@ every 1 {
   global slope
   global intercept
   global overallStiffness
+  global spatialCriteria
+  global temporalCriteria
+  global calcStiffEquilCritera
   
   #if {$targetOrientation == "2D"} {
   # Slope and intercept will be calculated below, but we still need to set the stiffness at all timesteps
@@ -1324,10 +1331,33 @@ every 1 {
     #set interpPoint [.right.view create oval [drawCircle $x $y 0.1 ] -fill $targetColor -outline $black -width 0 -tags interpPoint]
     
     #puts $xPositions
+
+    # Check to see if the subject as moved far enough to calculate a new stiffness equilibrium
+    if { ( [llength $xPositions] >= 1 ) && (calcStiffEquilCritera == "spatial" ) } {
+      # Pull the first point
+      set x0 [lindex $xPositions 0]
+      set y0 [lindex $yPositions 0]
+
+      set distTraveled [expr sqrt( (x - x0)^2 + (y - y0)^2 )]
+      if {distTraveled >= 1.5} {
+        set spatialCriteria 1
+      } else {
+        set spatialCriteria 0
+      }
+
+    }
     
-    
-    # Once the length of the list is a certain length (ie. enought time has ellapsed to make a calculation)
-    if { [llength $xPositions] >= 20} {
+    # Check to see if enough time has ellapsed to calculate a new stiffness equilibrium
+    if { ([llength $xPositions] >= 20) && (calcStiffEquilCritera == "temporal" )} {
+      set temporalCriteria 1
+    } else {
+      set temporalCriteria 0
+    }
+
+
+    # If either one of the criteria is met
+    if { (spatialCriteria == 1) || (temporalCriteria == 1) } {
+
       global gridColor
       # Delete the points used in the previous interpolation
       .right.view delete interpPoint
@@ -1360,24 +1390,11 @@ every 1 {
       set xPositions { }
       set yPositions { }
       set enablingCalcStiffEquil 0
+      # The critera is no longer met until it's time to recalculate the stiff equilibrium line again
+      set spatialCriteria 0
+      set temporalCriteria 0
       #.right.view itemconfigure $::interpPoint -fill ""
-      #.right.view delete interpPoint
-      
+      #.right.view delete interpPoint   
     }
-    
-    
-    
-    # Projection point
-    #puts "Current Poisition:"
-    #puts $x
-    #puts $y
-    
-    # Perform linear regression on points where the confidence in the correct direction is high
-    # Currently, data of the actual target locations is being used (the ideal case)
-    # Eventually, many data points will be used over a short window for this calculation
-  }
-  
-  
-  
+  }  
 }
-
