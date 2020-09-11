@@ -20,7 +20,7 @@ if {$suppressTuning == 1} {
   global selectedK_neg_IE
   global selectedK_pos_DP
   global selectedK_neg_DP
-
+  
   # Everything that needs to be set to skip all tuning trials (meaning no variable damping trials)
   set targetOrientation "2D"
   set currentTarget_X 0.0
@@ -33,7 +33,7 @@ if {$suppressTuning == 1} {
   set targetPositionsInBlock9_Y $path1_Y
   set targetPositionsInBlock_X $targetPositionsInBlock9_X
   set targetPositionsInBlock_Y $targetPositionsInBlock9_Y
-
+  
   # Using k values calculated for James in an old experiment
   set selectedK_pos_IE 0.5709778943261873
   set selectedK_neg_IE 0.3290692829920402
@@ -352,7 +352,7 @@ proc startTrials {} {
   puts "Start of trials"
   applyStiffness
   #setDampingEnvironment 1
-
+  
   if {$suppressTuning ==  1} {
     setDampingEnvironment $currentBlock
   } else {
@@ -424,9 +424,9 @@ proc endBlock {currentBlock} {
   global targetPositionsInBlock21_Y
   global targetPositionsInBlock22_X
   global targetPositionsInBlock22_Y
-
+  
   global trialsPerBlock
-
+  
   
   puts "End of block $currentBlock"
   
@@ -500,7 +500,7 @@ proc endBlock {currentBlock} {
       set targetPositionsInBlock $targetPositionsInBlock3_IE
       #puts "IE NEW TARGET LOCATIONS 3"
     }
-
+    
     ############################# DP TUNING #############################
     # Block 4
     if {[expr $currentBlock + 1] == 4} {
@@ -528,7 +528,7 @@ proc endBlock {currentBlock} {
       set targetPositionsInBlock $targetPositionsInBlock6_DP
       #puts "DP NEW TARGET LOCATIONS 6"
     }
-
+    
     ############################# PRACTICE BLOCKS #############################
     # Block 7
     if {[expr $currentBlock + 1] == 7} {
@@ -539,7 +539,7 @@ proc endBlock {currentBlock} {
       puts $selectedK_pos_DP
       puts "Here is the selected K from the previous block, for negative intent, DP direction:"
       puts $selectedK_neg_DP
-
+      
       set targetOrientation "2D"
       set targetPositionsInBlock_X $targetPositionsInBlock7_X
       set targetPositionsInBlock_Y $targetPositionsInBlock7_Y
@@ -758,14 +758,14 @@ proc setDampingEnvironment {currentBlock} {
   # Since everyBlockEnvironment is 0 indexed, need to subtract 1
   set currentDampingEnvironment [lindex $everyBlockEnvironment [expr $currentBlock - 1]]
   
- # To see information about the current damping enviornment of the block
+  # To see information about the current damping enviornment of the block
   #puts "Damping environment: $currentDampingEnvironment damping"
   
   # Apply the appropriate damping based on the current damping environment
   if {$currentDampingEnvironment == "zero" || $currentDampingEnvironment == "zero_IE" || $currentDampingEnvironment == "zero_DP" } {
     # Apply zero damping
     applyDamping 0 0
-
+    
     if {$suppressTuning == 0 } {
       set calculatingK 1
     }
@@ -816,24 +816,24 @@ proc applyDamping {damping_IE damping_DP} {
 }
 
 proc linFit points {
-    # linear regression y=ax+b for {{x0 y0} {x1 y1}...}
-    # returns {a b r}, where r: correlation coefficient
-    foreach i {N Sx Sy Sxy Sx2 Sy2} {set $i 0.0}
-    foreach point $points {
-        foreach {x y} $point break
-        set Sx  [expr {$Sx  + $x}]
-        set Sy  [expr {$Sy  + $y}]
-        set Sx2 [expr {$Sx2 + $x*$x}]
-        set Sy2 [expr {$Sy2 + $y*$y}]
-        set Sxy [expr {$Sxy + $x*$y}]
-        incr N
-    }
-    set t1 [expr {$N*$Sxy - $Sx*$Sy}]
-    set t2 [expr {$N*$Sx2 - $Sx*$Sx}]
-    set a [expr {double($t1)/$t2}]
-    set b [expr {double($Sy-$a*$Sx)/$N}]
-    set r [expr {$t1/(sqrt($t2)*sqrt($N*$Sy2-$Sy*$Sy))}]
-    list $a $b $r
+  # linear regression y=ax+b for {{x0 y0} {x1 y1}...}
+  # returns {a b r}, where r: correlation coefficient
+  foreach i {N Sx Sy Sxy Sx2 Sy2} {set $i 0.0}
+  foreach point $points {
+    foreach {x y} $point break
+    set Sx  [expr {$Sx  + $x}]
+    set Sy  [expr {$Sy  + $y}]
+    set Sx2 [expr {$Sx2 + $x*$x}]
+    set Sy2 [expr {$Sy2 + $y*$y}]
+    set Sxy [expr {$Sxy + $x*$y}]
+    incr N
+  }
+  set t1 [expr {$N*$Sxy - $Sx*$Sy}]
+  set t2 [expr {$N*$Sx2 - $Sx*$Sx}]
+  set a [expr {double($t1)/$t2}]
+  set b [expr {double($Sy-$a*$Sx)/$N}]
+  set r [expr {$t1/(sqrt($t2)*sqrt($N*$Sy2-$Sy*$Sy))}]
+  list $a $b $r
 }
 
 # linearReg
@@ -850,35 +850,35 @@ proc linFit points {
 #    - (Estimate of) Slope B
 
 proc linearReg { xdata ydata } {
-
-   set sumx  0.0
-   set sumy  0.0
-   set sumx2 0.0
-   set sumy2 0.0
-   set sumxy 0.0
-   set df    0
-   foreach x $xdata y $ydata {
-      if { $x != "" && $y != "" } {
-         set sumx  [expr {$sumx+$x}]
-         set sumy  [expr {$sumy+$y}]
-         set sumx2 [expr {$sumx2+$x*$x}]
-         set sumy2 [expr {$sumy2+$y*$y}]
-         set sumxy [expr {$sumxy+$x*$y}]
-         incr df
-      }
-   }
-
-   # Calculate the intermediate quantities
-   set sx  [expr {$sumx2-$sumx*$sumx/$df}]
-   set sy  [expr {$sumy2-$sumy*$sumy/$df}]
-   set sxy [expr {$sumxy-$sumx*$sumy/$df}]
-
-   # Calculate the coefficients
-   set B [expr {$sxy/$sx}]
-   set A [expr {($sumy-$B*$sumx)/$df}]
-
-   # Return the list of parameters
-   return [list $A $B ]
+  
+  set sumx  0.0
+  set sumy  0.0
+  set sumx2 0.0
+  set sumy2 0.0
+  set sumxy 0.0
+  set df    0
+  foreach x $xdata y $ydata {
+    if { $x != "" && $y != "" } {
+      set sumx  [expr {$sumx+$x}]
+      set sumy  [expr {$sumy+$y}]
+      set sumx2 [expr {$sumx2+$x*$x}]
+      set sumy2 [expr {$sumy2+$y*$y}]
+      set sumxy [expr {$sumxy+$x*$y}]
+      incr df
+    }
+  }
+  
+  # Calculate the intermediate quantities
+  set sx  [expr {$sumx2-$sumx*$sumx/$df}]
+  set sy  [expr {$sumy2-$sumy*$sumy/$df}]
+  set sxy [expr {$sumxy-$sumx*$sumy/$df}]
+  
+  # Calculate the coefficients
+  set B [expr {$sxy/$sx}]
+  set A [expr {($sumy-$B*$sumx)/$df}]
+  
+  # Return the list of parameters
+  return [list $A $B ]
 }
 
 # stiff is 0 or 1 depending on if it's on or off
@@ -891,56 +891,56 @@ proc applyVariableStiffness {stiff startX startY endX endY} {
   global pi
   global overallStiffness
   global gridColor
-
+  
   #puts $currentTarget_X
   #puts $currentTarget_Y
   #puts $previousTarget_X
   #puts $previousTarget_Y
-
+  
   if {$stiff == 0} {
     wshm ankle_stiff_DP 0.0
     wshm ankle_stiff_IE 0.0
     wshm ankle_stiff_k12 0.0
     wshm ankle_stiff_k21 0.0
-  
+    
   } else {
-
+    
     # Find the position coordinates of the robot in degrees
     set coordinates [getRobotPosition .right.view]
     lassign $coordinates x y
-
+    
     # A vector
     set a1 [ expr -$x*($endX-$startX) - $y*($endY-$startY) ]
     set a2 [ expr -$startY*($endX-$startX) + $startX*($endY-$startY) ]
-
+    
     # B matrix
     set b11 [ expr $endX - $startX ]
     set b12 [ expr $endY - $startY ]
     set b21 [ expr $startY - $endY ]
     set b22 [ expr $endX - $startX ]
-
+    
     # Calculate projection
     set projx [ expr  -((($a1*$b22)/($b11*$b22-$b12*$b21))-(($a2*$b12)/($b11*$b22-$b12*$b21))) ]
     set projy [ expr  -((($a2*$b11)/($b11*$b22-$b12*$b21))-(($a1*$b21)/($b11*$b22-$b12*$b21))) ]
-
+    
     # Projection point
     #puts "Projection point:"
     #puts $projx
-    #puts $projy 
-
+    #puts $projy
+    
     # Convert degrees to radians
     set projx_rad [ expr  $projx * ( $pi / 180) ]
     set projy_rad [ expr  $projy * ( $pi / 180) ]
-
+    
     # Calculate the rotation angle
     #set xdist [ expr $endX - $startX ]
     #set ydist [ expr $endY - $startY ]
-
+    
     # Calculate the angle of rotation of stiffness ellipse
     #set angle [ expr atan2($ydist, $xdist) ]
     #puts "Angle:"
     #puts $angle
-
+    
     # Everything that needs to written to shared memory
     wshm ankle_stiff_DP $stiff
     wshm ankle_stiff_IE $stiff
@@ -949,36 +949,36 @@ proc applyVariableStiffness {stiff startX startY endX endY} {
     # Where the stiffness equilibrium should be placed in radians
     wshm ankle_dp_stiff_center $projy_rad
     wshm ankle_ie_stiff_center $projx_rad
-
+    
     # Check these in the shm to see what the issue is
     set xSHM [rshm ankle_ie_pos]
     set ySHM [rshm ankle_dp_pos]
     #puts "ankle_ie_pos and ankle_dp_pos"
     #puts $xSHM
     #puts $ySHM
-
+    
     set xref_posSHM [rshm ankle_ie_ref_pos]
     set yref_posSHM [rshm ankle_dp_ref_pos]
     #puts "ankle_ie_ref_pos and ankle_dp_ref_pos"
     #puts $xref_posSHM
     #puts $yref_posSHM
-
+    
     set xstiff_centerSHM [rshm ankle_ie_stiff_center]
     set ystiff_centerSHM [rshm ankle_dp_stiff_center]
     #puts "ankle_ie_stiff_center and ankle_dp_stiff_center"
     #puts $xstiff_centerSHM
     #puts $ystiff_centerSHM
-
+    
     # For some reason, this can't be accessed from the shared memory
     #set torque_IE [rshm ob->ankle_ie_torque]
     #set torque_DP [rshm ob->ankle_dp_torque]
     #puts "ob->ankle_ie_torque and ankle_dp_torque"
     #puts $torque_IE
     #puts $torque_DP
-
+    
     #puts "Variable Stiffness applied"
   }
-
+  
 }
 
 # End of trials
@@ -987,14 +987,14 @@ proc endTrials {} {
   global selectedK_neg_IE
   global selectedK_pos_DP
   global selectedK_neg_DP
-
-  # Print out the K values to remind 
+  
+  # Print out the K values to remind
   puts "SAVE TERMINAL WINDOW FOR K VALUES: Shift+Ctrl+A to select all, then Edit>Copy, and paste in text file."
   puts "selectedK_pos_IE = $selectedK_pos_IE"
   puts "selectedK_neg_IE = $selectedK_neg_IE"
   puts "selectedK_pos_DP = $selectedK_pos_DP"
   puts "selectedK_neg_DP = $selectedK_neg_DP"
-
+  
   puts "End of trials"
   wshm ankle_stiff_DP 50.0
   wshm ankle_stiff_IE 50.0
@@ -1093,10 +1093,10 @@ every 1 {
   global slope
   global intercept
   global overallStiffness
-
+  
   #if {$targetOrientation == "2D"} {
-    # Slope and intercept will be calculated below, but we still need to set the stiffness at all timesteps
-    #applyVariableStiffness 1 -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
+  # Slope and intercept will be calculated below, but we still need to set the stiffness at all timesteps
+  #applyVariableStiffness 1 -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
   #}
   
   # When k is being calculated OR variable damping (1D or 2D) is enabled, need to find vel and accel
@@ -1252,28 +1252,28 @@ every 1 {
       # Negative
       set damping_DP [ expr { (-1) * ( ( 2 * $b_UB_DP ) / (1 + exp( (-1) * $selectedK_neg_DP * $vel_DP * $accel_DP) ) - $b_UB_DP ) + $b_C } ]
     }
-
+    
     # Calculate the overal user intent
     set previous_vtimesa_sum [ expr $previous_vtimesa_IE + $previous_vtimesa_DP]
     set vtimesa_sum [ expr $vtimesa_IE + $vtimesa_DP]
-
+    
     # Send stiffness based on a pre-made logistic function that provides near zero stiffness when intent is
     # less than zero and maximum stiffness when user intent is around 4 (k = -2.75)
     set variableStiffness [expr $overallStiffness / ( 1 + exp( -2.75 * $vtimesa_sum + 6.0 ) ) ]
-
-
-
-
+    
+    
+    
+    
     # First one means, yes apply stiffness, all other quanties specify along what path
     # Slope and intercept are updated later in the code below
     applyVariableStiffness $variableStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
     
     # Always apply a constant stiffness at the maximum (useful for testing)
     #applyVariableStiffness $overallStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
-
-
-
-
+    
+    
+    
+    
     # Draw a path with the color represending the current user intent
     set coordinates [getRobotPosition .right.view]
     lassign $coordinates x y
@@ -1282,13 +1282,13 @@ every 1 {
     } else {
       set pathPoint [.right.view create oval [drawCircle $x $y 0.2 ] -fill $posDampColor -outline $black -width 0 -tags pathPoint]
     }
-
-
+    
+    
     # If the intent as just passed 0.1
     #puts $previous_vtimesa_sum
     #puts $vtimesa_sum
-
-
+    
+    
     # 0.1 is the horizontal line on the vtimesa plot that is used as the threshold of when to start calculating intent
     if { $previous_vtimesa_sum < 0.1 && $vtimesa_sum >= 0.1 } {
       #puts "CALCULATE NEW STIFFNESS EQUILIBRUIM"
@@ -1298,34 +1298,34 @@ every 1 {
       #.right.view itemconfigure $::interpPoint -fill ""
       set enablingCalcStiffEquil 1
     }
-
+    
     # Set zero stiffness when intent is negative
     #if { $vtimesa_sum <= 0.01 } {
     #  applyVariableStiffness 0 0 0 0 0
     #}
-
-    set previous_vtimesa_IE $vtimesa_IE 
+    
+    set previous_vtimesa_IE $vtimesa_IE
     set previous_vtimesa_DP $vtimesa_DP
     
     # Now that the correct IE, DP, +, and - damping has been found for this time step, set the damping
     applyDamping $damping_IE $damping_DP
-
+    
   }
-
+  
   # Runs if the intent changed from negative to positive, which often cooresponds to a change in direction
   if {$enablingCalcStiffEquil == 1} {
     # Find the position coordinates of the robot in degrees
     set coordinates [getRobotPosition .right.view]
     lassign $coordinates x y
-
+    
     lappend xPositions $x
     lappend yPositions $y
-
+    
     #set interpPoint [.right.view create oval [drawCircle $x $y 0.1 ] -fill $targetColor -outline $black -width 0 -tags interpPoint]
-
+    
     #puts $xPositions
-
-
+    
+    
     # Once the length of the list is a certain length (ie. enought time has ellapsed to make a calculation)
     if { [llength $xPositions] >= 20} {
       global gridColor
@@ -1333,50 +1333,51 @@ every 1 {
       .right.view delete interpPoint
       # Draw all of the interpolation points being used for the regression
       foreach xPoint $xPositions yPoint $yPositions  {
-
+        
         set interpPoint [.right.view create oval [drawCircle $xPoint $yPoint 0.30 ] -fill "" -outline $black -width 0.01 -tags interpPoint]
       }
       
       # Perform linear regression on points where the confidence in the correct direction is high
-    # Currently, data of the actual target locations is being used (the ideal case)
-    # Eventually, many data points will be used over a short window for this calculation
+      # Currently, data of the actual target locations is being used (the ideal case)
+      # Eventually, many data points will be used over a short window for this calculation
       set result [linearReg $xPositions $yPositions]
-    #puts $result
-    lassign $result intercept slope
-
-    # Draw a line representing the equilibrium line where the stiffness is being applied
-    .right.view delete stiffLine
-
-    .right.view create line [drawLine -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept] ] -fill $gridColor -tags stiffLine -width 3 -dash -
-    
-    # Send stiffness based on a pre-made logistic function that provides near zero stiffness when intent is
-    # less than zero and maximum stiffness when user intent is around 4 (k = -2.75)
-    #set variableStiffness [expr $overallStiffness / ( 1 + exp( -2.75 * $vtimesa_sum + 6.0 ) ) ]
-
-    # First one means, yes apply stiffness, all other quanties specify along what path
-    #applyVariableStiffness $variableStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
-
-    #puts "Clear list"
+      #puts $result
+      lassign $result intercept slope
+      
+      # Draw a line representing the equilibrium line where the stiffness is being applied
+      .right.view delete stiffLine
+      
+      .right.view create line [drawLine -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept] ] -fill $gridColor -tags stiffLine -width 3 -dash -
+      
+      # Send stiffness based on a pre-made logistic function that provides near zero stiffness when intent is
+      # less than zero and maximum stiffness when user intent is around 4 (k = -2.75)
+      #set variableStiffness [expr $overallStiffness / ( 1 + exp( -2.75 * $vtimesa_sum + 6.0 ) ) ]
+      
+      # First one means, yes apply stiffness, all other quanties specify along what path
+      #applyVariableStiffness $variableStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
+      
+      #puts "Clear list"
       set xPositions { }
       set yPositions { }
       set enablingCalcStiffEquil 0
       #.right.view itemconfigure $::interpPoint -fill ""
       #.right.view delete interpPoint
-
+      
     }
-
-
-
+    
+    
+    
     # Projection point
     #puts "Current Poisition:"
     #puts $x
     #puts $y
-
+    
     # Perform linear regression on points where the confidence in the correct direction is high
     # Currently, data of the actual target locations is being used (the ideal case)
     # Eventually, many data points will be used over a short window for this calculation
   }
-
-
-
+  
+  
+  
 }
+
