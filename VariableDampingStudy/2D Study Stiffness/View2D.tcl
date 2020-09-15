@@ -45,7 +45,7 @@ set gridSpacing 1
 set scale [expr $canvasWidth / $degreeRange ]
 
 # Button names (cannot include spaces)
-set buttonList {"Gravity" "Start"}
+set buttonList {"Initialize" "Gravity" "Start"}
 
 # Colors
 set black "#000000"
@@ -186,6 +186,13 @@ proc buttonAction {place} {
   set buttonNumber [lsearch $buttonList $place]
   
   if {$buttonNumber == 0} {
+    # Set the stiffness and damping in preparation for gravity compenstation
+    initializeStiffDamp
+
+    # Disable the button after it has been pressed
+    .left.[string tolower [lindex $buttonList $buttonNumber]] configure -state disabled
+
+  } elseif {$buttonNumber == 1} {
     # Call gravity compensation function from controller
     gravityComp
     
@@ -198,7 +205,7 @@ proc buttonAction {place} {
     # Disable the button after it has been pressed
     .left.[string tolower [lindex $buttonList $buttonNumber]] configure -state disabled
     
-  } elseif {$buttonNumber == 1} {
+  } elseif {$buttonNumber == 2} {
     # Call startTrials function from controller
     startTrials
     
@@ -214,7 +221,7 @@ proc buttonAction {place} {
     # Disable the button after it has been pressed
     .left.[string tolower [lindex $buttonList $buttonNumber]] configure -state disabled
     
-  } elseif {$buttonNumber == 2} {
+  } elseif {$buttonNumber == 3} {
     #neutralReturn
   } else {
     puts "Unknown button command"

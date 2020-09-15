@@ -85,10 +85,10 @@ set variableDampingRange_DP [list $negativeDamping_DP $positiveDamping_DP]
 
 set variableDampingOffset 0.25
 
-# Stiffness values
+# Maximum stiffness value used in variable stiffness controller
 set overallStiffness 50
 #set overallStiffness 0
-puts "2D stiffness will be set to $overallStiffness Nm/rad"
+puts "2D stiffness will be set to a maximum of $overallStiffness Nm/rad"
 
 # Initialized list of every damping enviorment in order
 set everyBlockEnvironment {}
@@ -208,6 +208,35 @@ proc every {ms body} {
   after $ms [info level 0]
 }
 
+# Set the stiffness and damping values that are required before gravity compensation
+proc initializeStiffDamp {} {
+
+	# set the damping
+	wshm ankle_damp 2.0
+	wshm ankle_damp_IE 1.0
+
+	# How to increment the stiffness (pick a number which divides cleanly into 200)
+	set numberOfIncrements 10
+	set stiffnessIncrement [expr 200.0 / $numberOfIncrements]
+	set currentStiffness 0
+  
+	# At each 100 timesteps, update the stiffness
+	# Goal is to avoid suddenly applying a large stiffness
+	for {set index 1} {$index <= $numberOfIncrements} {incr index} {
+
+		set currentStiffness [expr $currentStiffness + $stiffnessIncrement ]
+
+		# Load ankle parameters from shm.tcl
+		wshm ankle_stiff $currentStiffness
+		wshm ankle_stiff_DP $currentStiffness
+		wshm ankle_stiff_IE $currentStiffness
+
+		after 100
+	}
+
+	puts "Stiffness and damping initialize"
+}
+
 # -------------------Robot Setup------------------------
 
 if {[info exists env(CROB_HOME)]} {
@@ -253,21 +282,25 @@ if {[rshm paused]} {
 # 24 is the new one for 2D with stiffness, 22 was the old one for 1D, had to also set ob(nlog) to 29 above since 29 col now
 wshm logfnid 24
 
+# Set the stiffness and damping in preparation for gravity compensation
+# This used to be where these values were set for preparation for gravity compensation
+# Now you must first hit the initialize button which calls (initializeStiffDamp)
+# Now, it is easy to see if the subject can go through the damping range
+
 # Load ankle parameters from shm.tcl (this might not be needed)
-wshm ankle_stiff 200.0
-wshm ankle_damp 2.0
+wshm ankle_stiff 0.0
+wshm ankle_damp 0.0
 wshm stiff 0.0
 wshm damp 0.0
 
-# Set the stiffness and damping in preparation for gravity compensation
-wshm ankle_stiff_DP 200
-wshm ankle_stiff_IE 200.0
+wshm ankle_stiff_DP 0.0
+wshm ankle_stiff_IE 0.0
 wshm ankle_stiff_k12 0.0
 wshm ankle_stiff_k21 0.0
 wshm ankle_dp_stiff_center 0.0
 wshm ankle_ie_stiff_center 0.0
 wshm ankle_damp_DP 0.0
-wshm ankle_damp_IE 1.0
+wshm ankle_damp_IE 0.0
 
 # Measurement rate
 set Hz 1000
