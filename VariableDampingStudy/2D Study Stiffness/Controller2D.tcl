@@ -8,8 +8,8 @@ bind . <Key-q> done
 
 # ---------------Study Specifications------------------
 
-# Used for testing purposes
-set suppressTuning 1
+# Used for testing purposes (1 to skip tuning trials, note a different block pattern is set if == 1)
+set suppressTuning 0
 
 # Which type of critera would you like to use for when to calculate a new stiffness equilibirum line
 # Set to either "spatial" or "temporal"
@@ -53,11 +53,11 @@ if {$suppressTuning == 1} {
 ###############################################################
 
 # Pattern 1: PPP VVV PPPP VVVV
-#set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_variable 1} {positive 3} {variable 3} {positive 4} {variable 4} ]
-#puts "Block Pattern 1"
+set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_positive 1} {practice_variable 1} {positive 3} {variable 3} {positive 4} {variable 4} ]
+puts "Block Pattern 1"
 
 # Pattern 2: VVV PPP VVVV PPPP
-set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_positive 1} {variable 3} {positive 3} {variable 4} {positive 4} ]
+#set dampingEnvironments [list {zero_IE 1} {tuning_IE 2} {zero_DP 1} {tuning_DP 2} {practice_variable 1} {practice_positive 1} {variable 3} {positive 3} {variable 4} {positive 4} ]
 #puts "Block Pattern 2"
 
 if {$suppressTuning == 1 } {
@@ -1052,6 +1052,8 @@ set xPositions { }
 set yPositions { }
 set slope 1
 set intercept 0
+set spatialCriteria 0
+set temporalCriteria 0
 
 # Main loop used for calculating k and for applying variable damping
 every 1 {
@@ -1273,7 +1275,14 @@ every 1 {
     
     # First one means, yes apply stiffness, all other quanties specify along what path
     # Slope and intercept are updated later in the code below
-    applyVariableStiffness $variableStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
+
+    if {$enablingCalcStiffEquil == 1} {
+    	# If we are calculating a new equilibirum line, set zero stiffness
+    	applyVariableStiffness 0 0 0 0 0
+    } else {
+    	applyVariableStiffness $variableStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
+    }
+    
     
     # Always apply a constant stiffness at the maximum (useful for testing)
     #applyVariableStiffness $overallStiffness -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept]
@@ -1340,7 +1349,8 @@ every 1 {
 
       # pow(x,y) = x^y
       set distTraveled [expr sqrt( pow(($x - $x0),2) + pow(($y - $y0),2) )]
-      if {$distTraveled >= 1.5} {
+      # The distance required is 0.05*(sqrt(15^2 + 7.5^2) = 0.838525
+      if {$distTraveled >= 0.838525} {
         set spatialCriteria 1
       } else {
         set spatialCriteria 0
