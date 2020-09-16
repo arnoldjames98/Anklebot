@@ -116,6 +116,7 @@ set pi [expr {atan(1) * 4.}]
 
 # --------------Initialized Variables-----------------
 
+# Want the first log to start at 1
 set logNumber 0
 set subjectName "name"
 set calculatingK 0
@@ -144,6 +145,19 @@ proc getRobotPosition {w} {
   set x [expr {$x * 180 / $pi }]
   set y [expr {$y * 180 / $pi }]
   return [list $x $y]
+}
+
+proc stopMVC {} {
+  global visualizeMVC
+  # Wait for enter to stop log
+  stop_log
+  puts "End of MVC data collection"
+  puts "Restart study with Anklebot on"
+  set visualizeMVC 0 
+  emgGraph destroy
+
+  # End the study since we'll need to now put the robot on
+  done
 }
 
 # Ends all procedures (binded to "q")
@@ -235,6 +249,26 @@ proc initializeStiffDamp {} {
 	}
 
 	puts "Stiffness and damping initialize"
+}
+
+proc collectMVC {} {
+  global subjectName
+  global ob
+  global everyBlockEnvironment
+  global suppressTuning
+  global currentBlock
+  global visualizeMVC
+  
+  puts "Collect MVC data without Anklebot"
+
+  # Creates a log file with a name in the form: name_MVC.dat
+  logSetup $subjectName [join [list "_MVC" ]]
+  start_log $ob(logf) $ob(nlog)
+
+  # Add some logic to plot the MVC data
+
+
+  
 }
 
 # -------------------Robot Setup------------------------
@@ -373,7 +407,6 @@ proc applyStiffness {} {
     wshm ankle_stiff_k21 0.0
     wshm ankle_dp_stiff_center 0.0
     wshm ankle_ie_stiff_center 0.0
-    puts "2D Stiffness applied"
   }
 }
 

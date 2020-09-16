@@ -27,7 +27,13 @@ set targetRadius 2.25
 # --------------Initialized Variables-----------------
 
 set studyStarted 0
+set visualizeMVC 0 
 set targetPositionsInBlock 0
+set mvc_time -1
+set emgMatrix_TA { }
+set emgMatrix_PL { }
+set emgMatrix_SL { }
+set emgMatrix_MG { }
 
 # -------------------Constants------------------------
 
@@ -45,7 +51,7 @@ set gridSpacing 1
 set scale [expr $canvasWidth / $degreeRange ]
 
 # Button names (cannot include spaces)
-set buttonList {"Initialize" "Gravity" "Start"}
+set buttonList {"MVC" "Initialize" "Gravity" "Start"}
 
 # Colors
 set black "#000000"
@@ -181,18 +187,19 @@ proc buttonAction {place} {
   global targetColor
   global targetPositionsInBlock
   global target
+  global visualizeMVC
   
   # Actions when buttons are pressed
   set buttonNumber [lsearch $buttonList $place]
   
-  if {$buttonNumber == 0} {
+  if {$buttonNumber == 1} {
     # Set the stiffness and damping in preparation for gravity compenstation
     initializeStiffDamp
 
     # Disable the button after it has been pressed
     .left.[string tolower [lindex $buttonList $buttonNumber]] configure -state disabled
 
-  } elseif {$buttonNumber == 1} {
+  } elseif {$buttonNumber == 2} {
     # Call gravity compensation function from controller
     gravityComp
     
@@ -205,7 +212,7 @@ proc buttonAction {place} {
     # Disable the button after it has been pressed
     .left.[string tolower [lindex $buttonList $buttonNumber]] configure -state disabled
     
-  } elseif {$buttonNumber == 2} {
+  } elseif {$buttonNumber == 3} {
     # Call startTrials function from controller
     startTrials
     
@@ -221,8 +228,15 @@ proc buttonAction {place} {
     # Disable the button after it has been pressed
     .left.[string tolower [lindex $buttonList $buttonNumber]] configure -state disabled
     
-  } elseif {$buttonNumber == 3} {
-    #neutralReturn
+  } elseif {$buttonNumber == 0} {
+
+    set visualizeMVC 1
+    
+    collectMVC
+
+    # Disable the button after it has been pressed
+    .left.[string tolower [lindex $buttonList $buttonNumber]] configure -state disabled
+
   } else {
     puts "Unknown button command"
   }
@@ -338,7 +352,8 @@ foreach b $buttonList {
 }
 
 # Add an end button
-pack [button .left.quit -text "End" -command done] -side bottom
+pack [button .left.quit -text "Stop MVC" -command stopMVC] -side bottom
+#pack [button .left.quit -text "End" -command done] -side bottom
 pack [canvas .right.view -width $canvasWidth -height $canvasHeight] \
     -side right -expand yes -fill both
 
@@ -454,6 +469,8 @@ every 10 {
   global outerCursor_DP
   global innerCursor_IE
   global outerCursor_IE
+
+  global visualizeMVC
   
   if {$studyStarted == 1} {
     
@@ -744,4 +761,76 @@ every 10 {
       }
     }
   }
+
+  if {$visualizeMVC == 1} {
+
+    global emgMatrix_TA
+    global emgMatrix_PL
+    global emgMatrix_SL
+    global emgMatrix_MG
+
+    global mvc_time
+
+    #puts "VISUALIZING MVC"
+
+    #if {$mvc_time > -1 } {
+    #  emgGraph destroy
+    #}
+    if {$mvc_time == -1} {
+      # TA Graph
+      #.right.view create text 150 80 -text "TA Response" -font [list Helvetica 20] -tags taText
+      #emu_graph::emu_graph emgGraphTA -canvas .right.view -width 300 -height 300 -xref 100 -yref 100
+      # PL Graph
+      #.right.view create text 750 80 -text "PL Response" -font [list Helvetica 20] -tags plText
+      #emu_graph::emu_graph emgGraphPL -canvas .right.view -width 300 -height 300 -xref 600 -yref 100
+
+      # All in one (making separate graphs created too much lag)
+      emu_graph::emu_graph emgGraph -canvas .right.view -width 600 -height 300 -xref 200 -yref 600
+    }
+
+    # If all y data is zero, the graph program crashes
+    if {$mvc_time == -1} {
+      set emgTA 0.0001
+      set emgPL 0.0001
+      set emgSL 0.0001
+      set emgMG 0.0001
+    } else {
+      set emgTA [rshm emg1]
+      set emgPL [rshm emg2]
+      set emgSL [rshm emg3]
+      set emgMG [rshm emg4]
+    }
+    #set emgTA [rshm ankle_ie_pos]
+
+    set mvc_time [expr $mvc_time + 1]
+    lappend emgMatrix_TA $mvc_time
+    lappend emgMatrix_TA $emgTA
+
+    lappend emgMatrix_PL $mvc_time
+    lappend emgMatrix_PL $emgPL
+
+    lappend emgMatrix_SL $mvc_time
+    lappend emgMatrix_SL $emgSL
+
+    lappend emgMatrix_MG $mvc_time
+    lappend emgMatrix_MG $emgMG
+
+    # Don't let the matricies get larger than 200 timesteps
+    set emgMatrix_TA [lrange $emgMatrix_TA end-199 end]
+    set emgMatrix_PL [lrange $emgMatrix_PL end-199 end]
+    set emgMatrix_SL [lrange $emgMatrix_SL end-199 end]
+    set emgMatrix_MG [lrange $emgMatrix_MG end-199 end]
+
+    #puts $emgMatrix_TA
+
+    if {$mvc_time > 5 } {
+      emgGraph data d1 -colour blue -points 0 -lines 1 -coords $emgMatrix_TA
+      emgGraph data d2 -colour red -points 0 -lines 1 -coords $emgMatrix_PL
+      emgGraph data d3 -colour green -points 0 -lines 1 -coords $emgMatrix_SL
+      emgGraph data d4 -colour yellow -points 0 -lines 1 -coords $emgMatrix_MG
+    }
+
+
+  }
+
 }
