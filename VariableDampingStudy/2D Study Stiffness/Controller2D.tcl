@@ -822,6 +822,7 @@ proc setDampingEnvironment {currentBlock} {
   global calculatingK
   global enablingVariableDamping
   global suppressTuning
+  global variableDampingOffset
   
   puts "Start of block $currentBlock"
   
@@ -851,9 +852,12 @@ proc setDampingEnvironment {currentBlock} {
     
   } elseif {$currentDampingEnvironment == "negative" || $currentDampingEnvironment == "practice_negative" } {
     applyDamping $negativeDamping_IE $negativeDamping_DP
+    puts "WARNING: Variable damping offset not included"
     
   } elseif {$currentDampingEnvironment == "positive" || $currentDampingEnvironment == "practice_positive" } {
-    applyDamping $positiveDamping_IE $positiveDamping_DP
+    #applyDamping $positiveDamping_IE $positiveDamping_DP
+    # We want to include the offset in this
+    applyDamping [expr $positiveDamping_IE + $variableDampingOffset ] [expr $positiveDamping_DP + $variableDampingOffset ]
     
   } else {
     puts "Error: $currentDampingEnvironment is not a known damping environment."
