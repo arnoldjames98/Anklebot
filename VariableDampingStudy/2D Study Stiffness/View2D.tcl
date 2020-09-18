@@ -51,7 +51,7 @@ set gridSpacing 1
 set scale [expr $canvasWidth / $degreeRange ]
 
 # Button names (cannot include spaces)
-set buttonList {"MVC" "Initialize" "Gravity" "Start"}
+set buttonList {"EMG" "MVC" "Initialize" "Gravity" "Start"}
 
 # Colors
 set black "#000000"
@@ -193,13 +193,21 @@ proc buttonAction {place} {
   set buttonNumber [lsearch $buttonList $place]
   
   if {$buttonNumber == 1} {
+    # After button 0 (MVC) is pressed, log the data
+    # Allows you to put on EMG sensors without logging the data
+    collectMVC
+
+    # Disable the button after it has been pressed
+    .left.[string tolower [lindex $buttonList $buttonNumber]] configure -state disabled
+
+  } elseif {$buttonNumber == 2} {
     # Set the stiffness and damping in preparation for gravity compenstation
     initializeStiffDamp
 
     # Disable the button after it has been pressed
     .left.[string tolower [lindex $buttonList $buttonNumber]] configure -state disabled
 
-  } elseif {$buttonNumber == 2} {
+  } elseif {$buttonNumber == 3} {
     # Call gravity compensation function from controller
     gravityComp
     
@@ -212,7 +220,7 @@ proc buttonAction {place} {
     # Disable the button after it has been pressed
     .left.[string tolower [lindex $buttonList $buttonNumber]] configure -state disabled
     
-  } elseif {$buttonNumber == 3} {
+  } elseif {$buttonNumber == 4} {
     # Call startTrials function from controller
     startTrials
     
@@ -231,8 +239,6 @@ proc buttonAction {place} {
   } elseif {$buttonNumber == 0} {
 
     set visualizeMVC 1
-    
-    collectMVC
 
     # Disable the button after it has been pressed
     .left.[string tolower [lindex $buttonList $buttonNumber]] configure -state disabled
@@ -352,7 +358,7 @@ foreach b $buttonList {
 }
 
 # Add an end button
-pack [button .left.quit -text "Stop MVC" -command stopMVC] -side bottom
+pack [button .left.quit -text "End MVC" -command stopMVC] -side bottom
 #pack [button .left.quit -text "End" -command done] -side bottom
 pack [canvas .right.view -width $canvasWidth -height $canvasHeight] \
     -side right -expand yes -fill both
@@ -815,11 +821,11 @@ every 10 {
     lappend emgMatrix_MG $mvc_time
     lappend emgMatrix_MG $emgMG
 
-    # Don't let the matricies get larger than 200 timesteps
-    set emgMatrix_TA [lrange $emgMatrix_TA end-199 end]
-    set emgMatrix_PL [lrange $emgMatrix_PL end-199 end]
-    set emgMatrix_SL [lrange $emgMatrix_SL end-199 end]
-    set emgMatrix_MG [lrange $emgMatrix_MG end-199 end]
+    # Don't let the matricies get larger than 300 timesteps
+    set emgMatrix_TA [lrange $emgMatrix_TA end-299 end]
+    set emgMatrix_PL [lrange $emgMatrix_PL end-299 end]
+    set emgMatrix_SL [lrange $emgMatrix_SL end-299 end]
+    set emgMatrix_MG [lrange $emgMatrix_MG end-299 end]
 
     #puts $emgMatrix_TA
 

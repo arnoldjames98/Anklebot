@@ -15,6 +15,10 @@ set suppressTuning 0
 # Set to either "spatial" or "temporal"
 set calcStiffEquilCritera "spatial"
 
+# Flag to visualize the user intent and stiffness regression calculations (0 = OFF)
+# Good for testing, bad for subject to get confused by in actual study
+set visualizeStiffness 0
+
 # Either DP, IE, or 2D
 # Initially set to IE since block 1 is set to be a tuning trial in the IE direction
 set targetOrientation "IE"
@@ -264,10 +268,6 @@ proc collectMVC {} {
   # Creates a log file with a name in the form: name_MVC.dat
   logSetup $subjectName [join [list "_MVC" ]]
   start_log $ob(logf) $ob(nlog)
-
-  # Add some logic to plot the MVC data
-
-
   
 }
 
@@ -757,6 +757,7 @@ proc endTrial {currentTrial} {
   global variableDampingRange_DP
   global targetOrientation
   global pathPoint
+  global visualizeStiffness
   
   
   # Find the current damping enviornment
@@ -765,7 +766,10 @@ proc endTrial {currentTrial} {
   # Output the current trial and its damping enviornment
   #puts "Trial $currentTrial of $totalTrials complete ($currentDampingEnvironment damping)"
   puts "Trial $currentTrial of $totalTrials complete"
-  .right.view delete pathPoint
+
+  if {$visualizeStiffness == 1} {
+  	.right.view delete pathPoint
+  }
   
   # Determine whether or not k needs to be calculated
   if {$calculatingK == 1} {
@@ -1172,6 +1176,7 @@ every 1 {
   global spatialCriteria
   global temporalCriteria
   global calcStiffEquilCritera
+  global visualizeStiffness
   
   #if {$targetOrientation == "2D"} {
   # Slope and intercept will be calculated below, but we still need to set the stiffness at all timesteps
@@ -1363,12 +1368,14 @@ every 1 {
     # Draw a path with the color represending the current user intent
     set coordinates [getRobotPosition .right.view]
     lassign $coordinates x y
-    if { $vtimesa_sum >= 0 } {
-      set pathPoint [.right.view create oval [drawCircle $x $y 0.2 ] -fill $negDampColor -outline $black -width 0 -tags pathPoint]
-    } else {
-      set pathPoint [.right.view create oval [drawCircle $x $y 0.2 ] -fill $posDampColor -outline $black -width 0 -tags pathPoint]
+
+    if {$visualizeStiffness == 1} {
+	    if { $vtimesa_sum >= 0 } {
+	      set pathPoint [.right.view create oval [drawCircle $x $y 0.2 ] -fill $negDampColor -outline $black -width 0 -tags pathPoint]
+	    } else {
+	      set pathPoint [.right.view create oval [drawCircle $x $y 0.2 ] -fill $posDampColor -outline $black -width 0 -tags pathPoint]
+	    }
     }
-    
     
     # If the intent as just passed 0.1
     #puts $previous_vtimesa_sum
@@ -1440,13 +1447,16 @@ every 1 {
     if { ($spatialCriteria == 1) || ($temporalCriteria == 1) } {
 
       global gridColor
-      # Delete the points used in the previous interpolation
-      .right.view delete interpPoint
-      # Draw all of the interpolation points being used for the regression
-      foreach xPoint $xPositions yPoint $yPositions  {
-        
-        set interpPoint [.right.view create oval [drawCircle $xPoint $yPoint 0.30 ] -fill "" -outline $black -width 0.01 -tags interpPoint]
-      }
+
+      if {$visualizeStiffness == 1} {
+	      # Delete the points used in the previous interpolation
+	      .right.view delete interpPoint
+	      # Draw all of the interpolation points being used for the regression
+	      foreach xPoint $xPositions yPoint $yPositions  {
+	        
+	        set interpPoint [.right.view create oval [drawCircle $xPoint $yPoint 0.30 ] -fill "" -outline $black -width 0.01 -tags interpPoint]
+	      }
+	  }
       
       # Perform linear regression on points where the confidence in the correct direction is high
       # Currently, data of the actual target locations is being used (the ideal case)
@@ -1459,11 +1469,12 @@ every 1 {
       wshm ankle_stiff_slope $slope
       wshm ankle_stiff_intercept $intercept
       
-      # Draw a line representing the equilibrium line where the stiffness is being applied
-      .right.view delete stiffLine
-      
-      .right.view create line [drawLine -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept] ] -fill $gridColor -tags stiffLine -width 3 -dash -
-      
+      if {$visualizeStiffness == 1} {
+	      # Draw a line representing the equilibrium line where the stiffness is being applied
+	      .right.view delete stiffLine
+	      
+	      .right.view create line [drawLine -100 [ expr $slope * -100 + $intercept] 100 [ expr $slope * 100 + $intercept] ] -fill $gridColor -tags stiffLine -width 3 -dash -
+	  }
       # Send stiffness based on a pre-made logistic function that provides near zero stiffness when intent is
       # less than zero and maximum stiffness when user intent is around 4 (k = -2.75)
       #set variableStiffness [expr $overallStiffness / ( 1 + exp( -2.75 * $vtimesa_sum + 6.0 ) ) ]
