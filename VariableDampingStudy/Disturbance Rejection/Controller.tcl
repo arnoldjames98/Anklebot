@@ -1,4 +1,4 @@
-## Controller2D.tcl
+## Controller.tcl
 # Created by James Arnold
 
 package require Tk
