@@ -1462,7 +1462,7 @@ every 1 {
       # Currently, data of the actual target locations is being used (the ideal case)
       # Eventually, many data points will be used over a short window for this calculation
       set result [linearReg $xPositions $yPositions]
-      # puts $result
+      #puts $result
       lassign $result intercept slope
 
       # Write the new slope and intercept to the shared memory
