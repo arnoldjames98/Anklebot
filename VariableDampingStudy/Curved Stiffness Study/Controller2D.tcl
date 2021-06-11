@@ -6,7 +6,9 @@ source /home/imt/imt/robot4/crob_ASU/shm.tcl
 global ob
 bind . <Key-q> done
 
+
 # ---------------Study Specifications------------------
+
 
 # Used for testing purposes (1 to skip tuning trials, note a different block pattern is set if == 1) 
 set suppressTuning 0
